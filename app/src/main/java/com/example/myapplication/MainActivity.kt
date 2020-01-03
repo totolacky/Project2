@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.example.myapplication.ui.main.SectionsPagerAdapter
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 
 class MainActivity : AppCompatActivity() {
 
