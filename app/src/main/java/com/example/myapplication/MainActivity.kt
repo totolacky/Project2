@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.example.myapplication.ui.main.SectionsPagerAdapter
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         val fab: FloatingActionButton = findViewById(R.id.fab)
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+            Snackbar.make(view, "Replace with your own fgssaction", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
     }
