@@ -72,7 +72,8 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        mFacebookCallbackManager?.onActivityResult(requestCode, resultCode, data);
+        mFacebookCallbackManager?.onActivityResult(requestCode, resultCode, data)
+
         super.onActivityResult(requestCode, resultCode, data);
 
 //        super.onActivityResult(requestCode, resultCode, data)
