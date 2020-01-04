@@ -1,6 +1,10 @@
 package com.example.myapplication
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
+import java.io.ByteArrayOutputStream
+
 
 object Util {
     /* Bitmap을 정사각형으로 자르는 메소드 */
@@ -56,5 +60,31 @@ object Util {
         }
         // Return the array
         return bitmaps
+    }
+
+    /*
+     * This functions converts Bitmap picture to a string which can be
+     * JSONified.
+     * */
+    private fun getStringFromBitmap(bitmapPicture: Bitmap): String? {
+        val COMPRESSION_QUALITY = 100
+        val encodedImage: String
+        val byteArrayBitmapStream = ByteArrayOutputStream()
+        bitmapPicture.compress(
+            Bitmap.CompressFormat.PNG, COMPRESSION_QUALITY,
+            byteArrayBitmapStream
+        )
+        val b: ByteArray = byteArrayBitmapStream.toByteArray()
+        encodedImage = Base64.encodeToString(b, Base64.DEFAULT)
+        return encodedImage
+    }
+
+    /*
+    * This Function converts the String back to Bitmap
+    * */
+    private fun getBitmapFromString(stringPicture: String): Bitmap? {
+        val decodedString =
+            Base64.decode(stringPicture, Base64.DEFAULT)
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
     }
 }
