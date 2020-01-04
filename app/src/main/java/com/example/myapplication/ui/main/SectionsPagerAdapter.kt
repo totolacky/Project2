@@ -23,10 +23,10 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) :
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
         when(position){
-            0 -> return AddressFragment.newInstance()
-            1 -> return ChatFragment.newInstance()
-            2 -> return GalleryFragment.newInstance()
-            else -> return PlaceholderFragment.newInstance()
+            0 -> return AddressFragment()
+            1 -> return ChatFragment()
+            2 -> return GalleryFragment()
+            else -> return PlaceholderFragment()
         }
     }
 
