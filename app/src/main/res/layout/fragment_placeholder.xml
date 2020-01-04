@@ -18,6 +18,7 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         app:layout_constraintLeft_toLeftOf="parent"
         tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintTop_creator="1" />
+        tools:layout_constraintTop_creator="1"
+        android:text="placeholder fragment"/>
 
 </RelativeLayout>

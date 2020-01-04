@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">My Application</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_1">Address</string>
+    <string name="tab_text_2">Chat</string>
     <string name="facebook_app_id">537129546885768</string> <string name="fb_login_protocol_scheme">fb537129546885768</string>
-    <string name="tab_text_3">Tab 3</string>
+    <string name="tab_text_3">Gallery</string>
 </resources>
