@@ -28,7 +28,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         FacebookSdk.sdkInitialize(applicationContext)
         AppEventsLogger.activateApp(this)
 
-        setContentView(R.layout.fragment_main)
+        setContentView(R.layout.activity_login)
 
         var loginButton = findViewById(R.id.login_button) as LoginButton
         loginButton.setReadPermissions("email")
