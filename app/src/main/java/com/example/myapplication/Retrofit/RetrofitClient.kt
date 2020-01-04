@@ -13,7 +13,7 @@ class RetrofitClient{
 
         @JvmStatic fun getinstance(): Retrofit?{
             if(instance==null){
-                instance = Retrofit.Builder().baseUrl("https://192.249.19.251:80/")
+                instance = Retrofit.Builder().baseUrl("http://192.249.19.251:80/")
                     .addConverterFactory(ScalarsConverterFactory.create())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create()).build()
             }

@@ -7,12 +7,12 @@ import retrofit2.http.POST
 
 interface IMyService {
 
-    @POST("/register")
     @FormUrlEncoded
+    @POST("register")
     fun registerUser(@Field("email") email: String, @Field("name") name: String): Observable<String>
 
-    @POST("/login")
     @FormUrlEncoded
+    @POST("login")
     fun loginUser(@Field("email") email: String): Observable<String>
 
 }

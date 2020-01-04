@@ -23,6 +23,12 @@ import androidx.core.app.ComponentActivity
 import androidx.core.app.ComponentActivity.ExtraData
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.util.Log.i
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.example.myapplication.Retrofit.IMyService
 import com.example.myapplication.Retrofit.RetrofitClient
 import com.facebook.GraphResponse
@@ -33,7 +39,8 @@ import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import retrofit2.Retrofit
 import retrofit2.create
-import java.security.AccessController.getContext
+import java.security.AccessControlContext
+import java.security.AccessController.getContext as getContext1
 
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
@@ -68,9 +75,10 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
 
         LoginManager.getInstance().registerCallback(mFacebookCallbackManager,
-            object : FacebookCallback<LoginResult?> {
-                override fun onSuccess(loginResult: LoginResult?) { // App code
+            object : FacebookCallback<LoginResult> {
+                override fun onSuccess(loginResult: LoginResult) { // App code
 
+                    // 로그인해서 이메일, 이름 받아오기
                     var name: String = ""
                     var email: String = ""
 
@@ -90,7 +98,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                     request.parameters = parameters
                     request.executeAsync()
 
-                    var compositeDisposable: CompositeDisposable = CompositeDisposable()
+
+                    // 받아온 거 서버로 전송
+
+                    ///// retrofit으로 했는데 망한 거 같음
+                    /*var compositeDisposable: CompositeDisposable = CompositeDisposable()
                     var retrofitClient: Retrofit? = RetrofitClient.getinstance()
                     var iMyService: IMyService = retrofitClient!!.create(IMyService::class.java)
 
@@ -102,7 +114,24 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                                 Toast.makeText(this as Context, ""+response, Toast.LENGTH_SHORT).show()
                             }
                         })
-                    )
+                    )*/
+
+                    ////// volley로 재도전
+                    lateinit var requestQueue: RequestQueue
+                    requestQueue = Volley.newRequestQueue(applicationContext)
+                    lateinit var stringRequest: StringRequest
+                    val url = "https://localhost:80/"
+
+                    stringRequest = StringRequest(Request.Method.GET, url, Response.Listener<String> {
+                                response -> Log.d("response","ok")
+                        }, Response.ErrorListener {
+                                error ->  i(applicationContext.packageName, error.toString())
+                        })
+
+                        // Set tag for cancel
+                        stringRequest.tag = applicationContext.packageName
+                        // Request
+                        requestQueue.add(stringRequest)
 
                 }
 
