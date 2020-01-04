@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="70dp"
+    android:padding="5dip" >
+
+    <ImageView
+        android:id="@+id/elem_image"
+        android:layout_width="@dimen/profile_image"
+        android:layout_height="@dimen/profile_image"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="6dip"
+        android:layout_marginRight="10dip"
+        android:src="@drawable/def_icon" />
+
+    <ImageView
+        android:id="@+id/circle_mask"
+        android:layout_height="@dimen/profile_image"
+        android:layout_width="@dimen/profile_image"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="0dip"
+        android:src="@drawable/circle_mask"
+        android:layout_marginEnd="6dip"/>
+
+    <TextView
+        android:id="@+id/elem_status"
+        android:layout_width="fill_parent"
+        android:layout_height="26dip"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@id/circle_mask"
+        android:ellipsize="marquee"
+        android:text="@string/default_status"
+        android:textSize="12sp"
+        android:singleLine="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/elem_image"/>
+
+    <TextView
+        android:id="@+id/elem_name"
+        android:layout_width="fill_parent"
+        android:layout_height="20dip"
+        android:layout_above="@id/elem_status"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_toRightOf="@id/circle_mask"
+        android:gravity="center_vertical"
+        android:text="@string/default_name"
+        android:textSize="20sp"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/elem_image"/>
+
+    <ImageView
+        android:id="@+id/elem_flag"
+        android:layout_height="50dp"
+        android:layout_width="50dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="0dip"
+        android:foregroundGravity="center"
+        android:src="@drawable/flag_0"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="6dip"
+        android:layout_alignParentEnd="true" />
+
+
+</RelativeLayout>
