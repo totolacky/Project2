@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.ContactData
 import com.example.myapplication.R
 import kotlinx.android.synthetic.main.fragment_contact.*
-import java.time.Duration
 
 /**
  * The address fragment.
