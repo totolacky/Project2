@@ -64,6 +64,7 @@ class ContactFragment : Fragment() {
 
         // Default arraylist
         val arrayList = ArrayList<ContactData?>()
+
         arrayList.add(ContactData("0","Tom",null,0,null,null,null,null))
         arrayList.add(ContactData("1","Mike","feel like Mike",0,null,null,null,null))
         arrayList.add(ContactData("2","Henry","feel like Henry",0,null,null,null,null))
@@ -77,6 +78,7 @@ class ContactFragment : Fragment() {
         arrayList.add(ContactData("10","Kevin","hehehehehe",0,null,null,null,null))
         arrayList.add(ContactData("11","Jake",null,0,null,null,null,null))
         arrayList.add(ContactData("12","Jane","null?",0,null,null,null,null))
+
 
         return arrayList
     }

@@ -1,7 +1,6 @@
 // Import package
 var mongodb = require('mongodb');
-var ObjectID = mongodb.ObjectID;
-var crypto = require('crypto')
+//var ObjectID = mongodb.ObjectID;
 var express = require('express')
 var bodyParser = require('body-parser')
 
@@ -25,20 +24,20 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             var post_data = request.body;
 
             var name = post_data.name;
-            var email = post_data.email;
+            var id = post_data.id;
 
             var insertJson = {
-                'email' : email,
+                'id' : id,
                 'name' : name
             };
 
-            var db = client.db('edmtdevnodejs');
+            var db = client.db('penstagram');
 
             // check exists email
-            db.collection('user').find({'email':email}).count(function(err,number){
+            db.collection('user').find({'id':id}).count(function(err,number){
                 if(number!=0){
-                    response.json('Email already exists');
-                    console.log('Email already exists');
+                    response.json('You already have the account');
+                    console.log('You already have the account');
                 }
                 else{
                     // insert data
@@ -53,25 +52,51 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
         app.post('/login', (request,response,next)=>{
             var post_data = request.body;
 
-            var email = post_data.email;
+            var id = post_data.id;
 
-            var db = client.db('edmtdevnodejs');
+            var db = client.db('penstagram');
 
-            // check exists email
-            db.collection('user').find({'email':email}).count(function(err,number){
+            // check exists id
+            db.collection('user').find({'id':id}).count(function(err,number){
                 if(number==0){
-                    response.json('Email not exists');
-                    console.log('Email not exists');
+                    response.json('Matching account not exists');
+                    console.log('Matching account not exists');
                 }
                 else{
-                    // insert data
-                    db.collection('user').findOne({'email':email},function(err,user){
-                        response.json('Login success');
+                    db.collection('user').findOne({'id':id},function(err,user){
+                        response.json({'facebookId':id});
                         console.log('Login success');
                     })
                 }
             })
         });
+
+        app.post('/initGallery', (request,response,next)=>{
+            var post_data = request.body;
+
+            var id = post_data.id;
+
+            var db = client.db('penstagram');
+
+            // Pair<Bitmap(String),ContactData>
+            // user 랜덤 선택 (id ㄴㄴ) -> photo 랜덤 선택
+            var query = {'id':{$ne:id}};
+            var totalCnt = db.collection('user').count();
+            var skipSize = Math.floor(Math.random()*totalCnt);
+            var selectUser = db.collection('user').find(query).skip(skipSize).limit();
+
+            var projection = {'photos':1,'_id':0};
+            var photoCnt = selectUser.find(projection).body().count();
+            var randNum = Math.floor(Math.random()*photoCnt);
+            var selectedPhoto = selectUser.find(projection).body()[randNum];
+
+            var userContactData = {selectedUser}
+
+            response.json({Pair(selectedPhoto, userContactData)});
+            console.log('Send data to init gallery success');
+
+        });
+
 
         // Start Web Server
         app.listen(80, ()=>{
