@@ -159,7 +159,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                 // 갤러리에서 사진 불러오기
                 try{
                     var bitmap: Bitmap = MediaStore.Images.Media.getBitmap(getActivity()!!.getContentResolver(), dataUri)
-                    myContactData.photos!!.add(bitmap)
+                    myContactData.photos?.add(Util.getStringFromBitmap(bitmap) as String)
                     // 내 contact data에 올렸으니까 이거 db로 다시 올려야하는데 어떻게 보내지??
 
                     Toast.makeText(getContext(), "upload success", Toast.LENGTH_SHORT).show()

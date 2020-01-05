@@ -2,7 +2,6 @@ package com.example.myapplication
 
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -11,14 +10,18 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.myapplication.Util.squareBitmap
+import com.example.myapplication.Retrofit.MyService
 import com.example.myapplication.ui.main.HashtagAdapter
 import kotlinx.android.synthetic.main.activity_signup_0.*
 import kotlinx.android.synthetic.main.activity_signup_0.nextButton
 import kotlinx.android.synthetic.main.activity_signup_1.*
 import kotlinx.android.synthetic.main.activity_signup_2.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.Serializable
-
 
 class SignupActivity : AppCompatActivity() {
 
@@ -26,7 +29,7 @@ class SignupActivity : AppCompatActivity() {
 
     private val maxPagenum = 3
     var pageNum = 0  // checks which registration page the user is in
-    lateinit var contactData: Serializable
+    lateinit var contactData: ContactData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +50,7 @@ class SignupActivity : AppCompatActivity() {
     fun onCreateP0() {
         setContentView(R.layout.activity_signup_0)
 
-        nameEditText.text = Editable.Factory.getInstance().newEditable((contactData as ContactData).name)
+        nameEditText.text = Editable.Factory.getInstance().newEditable(contactData.name)
 
         profileImage.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK)
@@ -68,17 +71,17 @@ class SignupActivity : AppCompatActivity() {
                     0 -> {
                         flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_0))
                         language_text.text = "Unknown"
-                        (contactData as ContactData).country_code = 0
+                        contactData.country_code = 0
                     }
                     1 -> {
                         flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_1))
                         language_text.text = "Korean"
-                        (contactData as ContactData).country_code = 1
+                        contactData.country_code = 1
                     }
                     2 -> {
                         flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_2))
                         language_text.text = "English"
-                        (contactData as ContactData).country_code = 2
+                        contactData.country_code = 2
                     }
                 }
             }
@@ -87,7 +90,7 @@ class SignupActivity : AppCompatActivity() {
         }
         nextButton.setOnClickListener {
             Toast.makeText(applicationContext, "Next button clicked",Toast.LENGTH_LONG).show()
-            (contactData as ContactData).name = nameEditText.text.toString()
+            contactData.name = nameEditText.text.toString()
             moveOn()
         }
     }
@@ -97,7 +100,7 @@ class SignupActivity : AppCompatActivity() {
 
         nextButton.setOnClickListener {
             Toast.makeText(applicationContext, "Next button clicked",Toast.LENGTH_LONG).show()
-            (contactData as ContactData).status = statusEditText.text.toString()
+            contactData.status = statusEditText.text.toString()
             moveOn()
         }
     }
@@ -128,7 +131,7 @@ class SignupActivity : AppCompatActivity() {
 
         nextButton.setOnClickListener {
             Toast.makeText(applicationContext, "Finish button clicked",Toast.LENGTH_LONG).show()
-            (contactData as ContactData).hashtag = hashtagList as ArrayList<String>
+            contactData.hashtag = hashtagList as ArrayList<String>
             moveOn()
         }
     }
@@ -136,22 +139,53 @@ class SignupActivity : AppCompatActivity() {
     private fun moveOn() {
         pageNum += 1
 
-        if (pageNum == maxPagenum){
-            val nextIntent = Intent(this, MainActivity::class.java)
-            nextIntent.putExtra("contactData",contactData)
+        val nextIntent: Intent
 
-            startActivity(nextIntent)
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-            finish()
-        } else {
-            val nextIntent = Intent(this, SignupActivity::class.java)
+        if (pageNum != maxPagenum){
+            // Pass data to next signup activity
+            nextIntent = Intent(this, SignupActivity::class.java)
             nextIntent.putExtra("pageNum",pageNum)
             nextIntent.putExtra("contactData",contactData)
+        } else {
+            // Register account in server
+            var id: String? = null
 
-            startActivity(nextIntent)
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.slide_in_left)
-            finish()
+            var retrofit = Retrofit.Builder()
+                .baseUrl("http://192.249.19.250:7980")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            var myService: MyService = retrofit.create(MyService::class.java)
+
+            // 서버로 register 전송
+            myService.register(
+                contactData.facebookId,
+                contactData.name,
+                contactData.status,
+                contactData.country_code,
+                contactData.profile_photo,
+                contactData.photos,
+                contactData.friends,
+                contactData.hashtag
+            ).enqueue(object: Callback<String> {
+                override fun onFailure(call: Call<String>, t: Throwable){
+                    Log.e("register",t.message)
+                    Toast.makeText(applicationContext, "register fail", Toast.LENGTH_SHORT).show()
+                }
+                override fun onResponse(call: Call<String>, response: Response<String>){
+                    Log.d("id",response.body())
+                    id = response.body()
+                }
+            })
+
+            // Set next activity
+            nextIntent = Intent(this, MainActivity::class.java)
+            nextIntent.putExtra("id",id)
         }
+
+        startActivity(nextIntent)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        finish()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -159,7 +193,7 @@ class SignupActivity : AppCompatActivity() {
             //profileImage.setImageURI(data.data)
             val bm = MediaStore.Images.Media.getBitmap(contentResolver, data.data)
             profileImage.setImageBitmap(bm)
-            (contactData as ContactData).profile_photo = bm
+            contactData.profile_photo = Util.getStringFromBitmap(bm)
         }
     }
 }
