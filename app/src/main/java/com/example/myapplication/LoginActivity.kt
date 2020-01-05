@@ -5,9 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
+import com.example.myapplication.Retrofit.MyService
 import com.facebook.*
 import com.facebook.AccessToken
 import com.facebook.appevents.AppEventsLogger
@@ -15,6 +16,11 @@ import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
 import org.json.JSONException
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
 
 
@@ -28,17 +34,14 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         FacebookSdk.sdkInitialize(applicationContext)
         AppEventsLogger.activateApp(this)
 
-        setContentView(R.layout.fragment_main)
+        setContentView(R.layout.activity_login)
 
         var loginButton = findViewById(R.id.login_button) as LoginButton
         loginButton.setReadPermissions("email")
         // If using in a fragment
-        // If using in a fragment
-        //loginButton.activity = this as Fragment
 
         mFacebookCallbackManager = CallbackManager.Factory.create()
 
-        // Callback registration
         // Callback registration
         loginButton.registerCallback(mFacebookCallbackManager, object : FacebookCallback<LoginResult?> {
             override fun onSuccess(loginResult: LoginResult?) { // App code
@@ -51,32 +54,109 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             }
         })
 
+        var userName: String = ""
+        var userId: String = ""
+
 
         LoginManager.getInstance().registerCallback(mFacebookCallbackManager,
-            object : FacebookCallback<LoginResult?> {
-                override fun onSuccess(loginResult: LoginResult?) { // App code
+            object : FacebookCallback<LoginResult> {
+                override fun onSuccess(loginResult: LoginResult) { // App code
+
+                    // 로그인해서 이메일, 이름 받아오기
+                    val request = GraphRequest.newMeRequest(
+                        loginResult!!.accessToken
+                    ) { `object`, response ->
+                        try {
+                            userName = response.jsonObject.getString("name").toString()
+                            userId = response.jsonObject.getString("id").toString()
+                            Log.d("Result", userId+"  "+userName)
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
+                        }
+                    }
+                    val parameters = Bundle()
+                    parameters.putString("fields", "id,name")
+                    request.parameters = parameters
+                    request.executeAsync()
                 }
 
-                override fun onCancel() { // App code
+                override fun onCancel() {
+                    Toast.makeText(this as Context, "페이스북 로그인을 취소하셨습니다.", Toast.LENGTH_LONG).show()
                 }
 
-                override fun onError(exception: FacebookException) { // App code
+                override fun onError(exception: FacebookException) {
+                    Toast.makeText(this as Context, exception.message, Toast.LENGTH_LONG).show()
                 }
             })
 
-        val accessToken = AccessToken.getCurrentAccessToken()
-        val isLoggedIn = accessToken != null && !accessToken.isExpired
+        //val accessToken = AccessToken.getCurrentAccessToken()
+        //val isLoggedIn = accessToken != null && !accessToken.isExpired
+
+        var retrofit = Retrofit.Builder()
+            .baseUrl("http://192.249.19.251:9080")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        var myService: MyService = retrofit.create(MyService::class.java)
 
 
-        //initFacebook()
+        // register
+        var registerBtn: Button = findViewById(R.id.registerBtn)
+        registerBtn.setOnClickListener {
+            if(userId!="" && userName!="") {
+                // 서버로 register 전송
+                myService.registerUser(userId, userName).enqueue(object: Callback<String>{
+                    override fun onFailure(call: Call<String>, t: Throwable){
+                        Log.e("register",t.message)
+                        Toast.makeText(applicationContext, "register fail", Toast.LENGTH_SHORT).show()
+                    }
+                    override fun onResponse(call: Call<String>, response: Response<String>){
+                        Log.d("register",response.body())
+                    }
+                })
+
+                Log.d("registerBtn","send id and name to server")
+            }
+            else {
+                Toast.makeText(applicationContext, "login in Facebook first", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // login
+        var loginBtn: Button = findViewById(R.id.loginBtn)
+        loginBtn.setOnClickListener {
+            if(userId!=""){
+                // 서버로 login 전송
+                myService.loginUser(userId).enqueue(object: Callback<ContactData>{
+                    override fun onFailure(call: Call<ContactData>, t: Throwable){
+                        Log.e("login",t.message)
+                        Toast.makeText(applicationContext, "login fail", Toast.LENGTH_SHORT).show()
+                    }
+                    override fun onResponse(call: Call<ContactData>, response: Response<ContactData>){
+                        Log.d("login",response.body()!!.facebookId)
+
+                        // 메인으로 돌아가기
+                        val intent = Intent(applicationContext, MainActivity::class.java)
+                        intent.putExtra("id", userId)
+                        startActivity(intent)
+                    }
+                })
+                Log.d("loginBtn","send id to server")
+            }
+            else {
+                Toast.makeText(applicationContext, "login in Facebook first", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        mFacebookCallbackManager?.onActivityResult(requestCode, resultCode, data);
-        super.onActivityResult(requestCode, resultCode, data);
+        mFacebookCallbackManager?.onActivityResult(requestCode, resultCode, data)
 
-//        super.onActivityResult(requestCode, resultCode, data)
-//        mFacebookCallbackManager!!.onActivityResult(requestCode, resultCode, data)
+        super.onActivityResult(requestCode, resultCode, data)
+
     }
     /****************************************************************************************************************
      * Facebook
@@ -88,62 +168,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
      * @author binaries
      * @date   16.07.20
      */
-    private fun initFacebook() { //FaceBook Init
-        FacebookSdk.sdkInitialize(this.getApplicationContext())
-        mFacebookCallbackManager = CallbackManager.Factory.create()
-        LoginManager.getInstance().registerCallback(mFacebookCallbackManager,
-            object : FacebookCallback<LoginResult> {
-                override fun onSuccess(loginResult: LoginResult) {
-                    Log.d("Success", loginResult.accessToken.toString())
-                    Log.d(
-                        "Success",
-                        Profile.getCurrentProfile().id.toString()
-                    )
-                    Log.d(
-                        "Success",
-                        Profile.getCurrentProfile().name.toString()
-                    )
-                    Log.d(
-                        "Success",
-                        Profile.getCurrentProfile().getProfilePictureUri(
-                            200,
-                            200
-                        ).toString()
-                    )
-                    requestUserProfile(loginResult)
-                }
 
-                override fun onCancel() {
-                    Toast.makeText(this as Context, "페이스북 로그인을 취소하셨습니다.", Toast.LENGTH_LONG).show()
-                }
-
-                override fun onError(exception: FacebookException) {
-                    Toast.makeText(this as Context, exception.message, Toast.LENGTH_LONG).show()
-                }
-            })
-    }
-
-    fun requestUserProfile(loginResult: LoginResult) {
-        val request = GraphRequest.newMeRequest(
-            loginResult.accessToken
-        ) { `object`, response ->
-            try {
-                val email =
-                    response.jsonObject.getString("email").toString()
-                Log.d("Result", email)
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-        }
-        val parameters = Bundle()
-        parameters.putString("fields", "email")
-        request.parameters = parameters
-        request.executeAsync()
-    }
-
-    /****************************************************************************************************************
-     * Facebook
-     */
     override fun onClick(v: View) {
         when (v.id) {
             R.id.login_button -> LoginManager.getInstance().logInWithReadPermissions(
