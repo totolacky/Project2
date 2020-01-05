@@ -83,16 +83,16 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             var query = {'id':{$ne:id}};
             var totalCnt = db.collection('user').count();
             var skipSize = Math.floor(Math.random()*totalCnt);
-            var selectUser = db.collection('user').find(query).skip(skipSize).limit();
+            var selectUser = db.collection('user').find(query).skip(skipSize).limit(1);
 
             var projection = {'photos':1,'_id':0};
-            var photoCnt = selectUser.find(projection).body().count();
-            var randNum = Math.floor(Math.random()*photoCnt);
-            var selectedPhoto = selectUser.find(projection).body()[randNum];
+            var photoArray = db.collection('user').find(query, projection).skip(skipSize).limit(1);
+            var randNum = Math.floor(Math.random()*photoArray.size);
+            var selectedPhoto = photoArray[randNum];
 
-            var userContactData = {selectedUser}
+            var userContactData = selectUser.body
 
-            response.json({Pair(selectedPhoto, userContactData)});
+            response.json({'Pair()':{selectedPhoto, userContactData}});
             console.log('Send data to init gallery success');
 
         });
