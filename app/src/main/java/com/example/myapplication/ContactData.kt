@@ -2,7 +2,7 @@ package com.example.myapplication
 
 import android.graphics.Bitmap
 
-data class ContactData(var facebookId: Int = 0,
+data class ContactData(var facebookId: String = "",
                        var name: String = "myName",
                        var status: String? = null,
                        var country_code: Int = 0,
