@@ -64,19 +64,19 @@ class ContactFragment : Fragment() {
 
         // Default arraylist
         val arrayList = ArrayList<ContactData?>()
-        arrayList.add(ContactData(0,"Tom",null,0,null,"tom@example.com",null,null,null))
-        arrayList.add(ContactData(1,"Mike","feel like Mike",0,null,"mike@example.com",null,null,null))
-        arrayList.add(ContactData(2,"Henry","feel like Henry",0,null,"henry@example.com",null,null,null))
-        arrayList.add(ContactData(3,"Alice","feel sooooo Alice",0,null,"alice@example.com",null,null,null))
-        arrayList.add(ContactData(4,"Julia","hehe",0,null,"julia@example.com",null,null,null))
-        arrayList.add(ContactData(5,"Daniel",null,0,null,"daniel@example.com",null,null,null))
-        arrayList.add(ContactData(6,"Steve",null,0,null,"steve@example.com",null,null,null))
-        arrayList.add(ContactData(7,"Sophie","hi",0,null,"sophie@example.com",null,null,null))
-        arrayList.add(ContactData(8,"Timothy","heyy",0,null,"timothy@example.com",null,null,null))
-        arrayList.add(ContactData(9,"Julien","yo",0,null,"julien@example.com",null,null,null))
-        arrayList.add(ContactData(10,"Kevin","hehehehehe",0,null,"kevin@example.com",null,null,null))
-        arrayList.add(ContactData(11,"Jake",null,0,null,"jake@example.com",null,null,null))
-        arrayList.add(ContactData(12,"Jane","null?",0,null,"jane@example.com",null,null,null))
+        arrayList.add(ContactData(0,"Tom",null,0,null,null,null,null))
+        arrayList.add(ContactData(1,"Mike","feel like Mike",0,null,null,null,null))
+        arrayList.add(ContactData(2,"Henry","feel like Henry",0,null,null,null,null))
+        arrayList.add(ContactData(3,"Alice","feel sooooo Alice",0,null,null,null,null))
+        arrayList.add(ContactData(4,"Julia","hehe",0,null,null,null,null))
+        arrayList.add(ContactData(5,"Daniel",null,0,null,null,null,null))
+        arrayList.add(ContactData(6,"Steve",null,0,null,null,null,null))
+        arrayList.add(ContactData(7,"Sophie","hi",0,null,null,null,null))
+        arrayList.add(ContactData(8,"Timothy","heyy",0,null,null,null,null))
+        arrayList.add(ContactData(9,"Julien","yo",0,null,null,null,null))
+        arrayList.add(ContactData(10,"Kevin","hehehehehe",0,null,null,null,null))
+        arrayList.add(ContactData(11,"Jake",null,0,null,null,null,null))
+        arrayList.add(ContactData(12,"Jane","null?",0,null,null,null,null))
 
         return arrayList
     }
