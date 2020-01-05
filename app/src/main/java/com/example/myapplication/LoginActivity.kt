@@ -5,9 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
+import com.example.myapplication.Retrofit.MyService
 import com.facebook.*
 import com.facebook.AccessToken
 import com.facebook.appevents.AppEventsLogger
@@ -15,32 +16,13 @@ import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
 import org.json.JSONException
-import java.util.*
-import com.facebook.Profile.getCurrentProfile
-import com.facebook.ProfileTracker
-import org.json.JSONObject
-import androidx.core.app.ComponentActivity
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.util.Log.i
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import com.example.myapplication.Retrofit.IMyService
-import com.example.myapplication.Retrofit.RetrofitClient
-import com.facebook.GraphResponse
-import com.facebook.GraphRequest
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Consumer
-import io.reactivex.schedulers.Schedulers
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.create
-import java.security.AccessControlContext
-import java.security.AccessController.getContext as getContext1
+import retrofit2.converter.gson.GsonConverterFactory
+import java.security.AccessController.getContext
+import java.util.*
 
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
@@ -73,22 +55,22 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             }
         })
 
+        var userName: String = ""
+        var userEmail: String = ""
+
 
         LoginManager.getInstance().registerCallback(mFacebookCallbackManager,
             object : FacebookCallback<LoginResult> {
                 override fun onSuccess(loginResult: LoginResult) { // App code
 
                     // 로그인해서 이메일, 이름 받아오기
-                    var name: String = ""
-                    var email: String = ""
-
                     val request = GraphRequest.newMeRequest(
                         loginResult!!.accessToken
                     ) { `object`, response ->
                         try {
-                            name = response.jsonObject.getString("name").toString()
-                            email = response.jsonObject.getString("email").toString()
-                            Log.d("Result", email+"  "+name)
+                            userName = response.jsonObject.getString("name").toString()
+                            userEmail = response.jsonObject.getString("email").toString()
+                            Log.d("Result", userEmail+"  "+userName)
                         } catch (e: JSONException) {
                             e.printStackTrace()
                         }
@@ -116,8 +98,8 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                         })
                     )*/
 
-                    ////// volley로 재도전
-                    lateinit var requestQueue: RequestQueue
+                    ////// volley로 재도전한거도망한거같음
+                    /*lateinit var requestQueue: RequestQueue
                     requestQueue = Volley.newRequestQueue(applicationContext)
                     lateinit var stringRequest: StringRequest
                     val url = "https://localhost:80/"
@@ -132,6 +114,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                         stringRequest.tag = applicationContext.packageName
                         // Request
                         requestQueue.add(stringRequest)
+                        */
 
                 }
 
@@ -146,6 +129,57 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
         val accessToken = AccessToken.getCurrentAccessToken()
         val isLoggedIn = accessToken != null && !accessToken.isExpired
+
+        var retrofit = Retrofit.Builder()
+            .baseUrl("http://192.249.19.251:9080")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        var myService: MyService = retrofit.create(MyService::class.java)
+
+
+        var registerBtn: Button = findViewById(R.id.registerBtn)
+        registerBtn.setOnClickListener {
+            if(userEmail!="" && userName!="") {
+                // 서버로 register 전송
+                myService.registerUser(userEmail, userName).enqueue(object: Callback<String>{
+                    override fun onFailure(call: Call<String>, t: Throwable){
+                        Log.e("register",t.message)
+                        Toast.makeText(applicationContext, "register fail", Toast.LENGTH_SHORT).show()
+                    }
+                    override fun onResponse(call: Call<String>, response: Response<String>){
+                        Log.d("register","????????")
+                    }
+                })
+
+                Log.d("registerBtn","send email and name to server")
+            }
+            else {
+                Toast.makeText(applicationContext, "login in Facebook first", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        var loginBtn: Button = findViewById(R.id.loginBtn)
+        loginBtn.setOnClickListener {
+            if(userEmail!=""){
+                // 서버로 login 전송
+                myService.loginUser(userEmail).enqueue(object: Callback<String>{
+                    override fun onFailure(call: Call<String>, t: Throwable){
+                        Log.e("login",t.message)
+                        Toast.makeText(applicationContext, "login fail", Toast.LENGTH_SHORT).show()
+                    }
+                    override fun onResponse(call: Call<String>, response: Response<String>){
+                        Log.d("login","?????????????")
+                    }
+                })
+                Log.d("loginBtn","send email to server")
+            }
+            else {
+                Toast.makeText(applicationContext, "login in Facebook first", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
 
     }
 
