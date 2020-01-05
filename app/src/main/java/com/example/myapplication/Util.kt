@@ -66,7 +66,7 @@ object Util {
      * This functions converts Bitmap picture to a string which can be
      * JSONified.
      * */
-    private fun getStringFromBitmap(bitmapPicture: Bitmap): String? {
+    fun getStringFromBitmap(bitmapPicture: Bitmap): String? {
         val COMPRESSION_QUALITY = 100
         val encodedImage: String
         val byteArrayBitmapStream = ByteArrayOutputStream()
@@ -82,7 +82,7 @@ object Util {
     /*
     * This Function converts the String back to Bitmap
     * */
-    private fun getBitmapFromString(stringPicture: String): Bitmap? {
+    fun getBitmapFromString(stringPicture: String): Bitmap? {
         val decodedString =
             Base64.decode(stringPicture, Base64.DEFAULT)
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
