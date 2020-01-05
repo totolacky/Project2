@@ -2,15 +2,13 @@ package com.example.myapplication
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import java.net.URL
-import java.util.ArrayList
+import java.util.*
 
 class ChatAdapter(val context: Context, val arrayList: ArrayList<ChatModel>)
     :  RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -39,7 +37,6 @@ class ChatAdapter(val context: Context, val arrayList: ArrayList<ChatModel>)
 
     override fun getItemCount(): Int {
         return arrayList.size
-
     }
 
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, i: Int) {
@@ -55,7 +52,6 @@ class ChatAdapter(val context: Context, val arrayList: ArrayList<ChatModel>)
             (viewHolder as Holder2).chat_Text?.setText(arrayList.get(i).script)
             (viewHolder as Holder2).chat_Time?.setText(arrayList.get(i).date_time)
         }
-
     }
 
     //내가친 채팅 뷰홀더
