@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,10 +14,14 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.*
-import com.example.myapplication.ContactData
-import com.example.myapplication.GalleryItem
-import com.example.myapplication.R
+import com.example.myapplication.*
+import com.example.myapplication.Retrofit.MyService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 
 class GalleryHolder{
@@ -39,6 +44,8 @@ class GalleryHolder{
 var myGalleryHolder = GalleryHolder()
 var myGalleryList: ArrayList<GalleryItem> = ArrayList()
 
+var myContactData: ContactData = ContactData()
+
 
 class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInterface {
 
@@ -51,6 +58,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
         savedInstanceState: Bundle?
     ): View? {
 
+        // main이 준 id로 myContactData 완성 (db에서 끌어옴)
 
         init()
 
@@ -92,10 +100,39 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
         startActivity(intent)
     }
 
+    var retrofit = Retrofit.Builder()
+        .baseUrl("http://192.249.19.251:9080")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    var myService: MyService = retrofit.create(MyService::class.java)
+
+
+    var initNum: Int = 5
 
     // 내 갤러리에는 남들의 사진들이 뜸
     fun init(){
+        // 서버한테 요청
+        for(i in 1..initNum) {
+            myService.getGallery(myContactData.facebookId)
+                .enqueue(object : Callback<Pair<String, ContactData>> {
+                    override fun onFailure(
+                        call: Call<Pair<String, ContactData>>, t: Throwable
+                    ) {
+                        Log.e("gallery", t.message)
+                        Toast.makeText(getContext(), "get gallery fail", Toast.LENGTH_SHORT).show()
+                    }
 
+                    override fun onResponse(
+                        call: Call<Pair<String, ContactData>>, response: Response<Pair<String, ContactData>>
+                    ) {
+                        Log.d("gallery", "init response ok")
+                        myGalleryList.add(GalleryItem(Util.getBitmapFromString(response.body()!!.first), response.body()!!.second))
+                    }
+                })
+        }
+        myGalleryHolder.setDataList(myGalleryList)
+        Log.d("init gallery","other users' photos and ContactDatas")
     }
 
 
@@ -122,9 +159,9 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                 // 갤러리에서 사진 불러오기
                 try{
                     var bitmap: Bitmap = MediaStore.Images.Media.getBitmap(getActivity()!!.getContentResolver(), dataUri)
-                    // DB에 있는 내 정보..... (어떻게받아오지???)
-                    var myInfo: ContactData
-                    //myInfo.photos!!.add(bitmap)
+                    myContactData.photos!!.add(bitmap)
+                    // 내 contact data에 올렸으니까 이거 db로 다시 올려야하는데 어떻게 보내지??
+
                     Toast.makeText(getContext(), "upload success", Toast.LENGTH_SHORT).show()
                 }catch (e:Exception){
                     Toast.makeText(getContext(), "$e", Toast.LENGTH_SHORT).show()
