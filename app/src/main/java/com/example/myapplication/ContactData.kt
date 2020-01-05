@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.graphics.Bitmap
+import java.io.Serializable
 
 data class ContactData(var facebookId: String = "",
                        var name: String = "myName",
@@ -9,6 +10,5 @@ data class ContactData(var facebookId: String = "",
                        var profile_photo: Bitmap? = null,
                        var photos: ArrayList<Bitmap>? = null,
                        var friends: ArrayList<Int>? = null,
-                       var hashtag: ArrayList<String>? = null){
+                       var hashtag: ArrayList<String>? = null) : Serializable
 
-}
