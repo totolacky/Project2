@@ -30,8 +30,31 @@ class MainActivity : AppCompatActivity() {
 //        }
 
 
-
+        testData()
 
 
     }
+
+
+
+    // db에 테스트 계정들 올리기
+    fun testData(){
+        ContactData("0","Tom",null,0,null,null,null,null)
+        ContactData("1","Mike","feel like Mike",0,null,null,null,null)
+        ContactData("2","Henry","feel like Henry",0,null,null,null,null)
+        ContactData("3","Alice","feel sooooo Alice",0,null,null,null,null)
+        ContactData("4","Julia","hehe",0,null,null,null,null)
+        ContactData("5","Daniel",null,0,null,null,null,null)
+        ContactData("6","Steve",null,0,null,null,null,null)
+        ContactData("7","Sophie","hi",0,null,null,null,null)
+        ContactData("8","Timothy","heyy",0,null,null,null,null)
+        ContactData("9","Julien","yo",0,null,null,null,null)
+        ContactData("10","Kevin","hehehehehe",0,null,null,null,null)
+        ContactData("11","Jake",null,0,null,null,null,null)
+        ContactData("12","Jane","null?",0,null,null,null,null)
+    }
+
+
+
+
 }

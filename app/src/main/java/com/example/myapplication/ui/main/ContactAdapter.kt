@@ -57,8 +57,7 @@ class ContactAdapter(val context: Context, val contactList: ArrayList<ContactDat
             // 프로필 사진 설정
             var prof_photo = BitmapFactory.decodeResource(context.resources,R.drawable.def_icon)
             if (prof.profile_photo != null) {
-                val pp = prof.profile_photo
-                prof_photo = Util.getBitmapFromString(pp as String)
+                prof_photo = Util.getBitmapFromString(prof.profile_photo!!)
             }
             elem_photo.setImageBitmap(Util.resizingBitmap(Util.squareBitmap(prof_photo),120))
 

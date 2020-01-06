@@ -1,18 +1,12 @@
 package com.example.myapplication.Retrofit
 
-import android.graphics.Bitmap
 import com.example.myapplication.ContactData
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
-import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface MyService {
-
-    @FormUrlEncoded
-    @POST("/registerUser")
-    fun registerUser(@Field("id") id: String, @Field("name") name: String): Call<String>
 
     @FormUrlEncoded
     @POST("/register")
@@ -26,16 +20,16 @@ interface MyService {
                  @Field("hashtag") hashtag: ArrayList<String>?): Call<String>
 
     @FormUrlEncoded
-    @GET("/checkRegistered")
-    fun checkRegisterd(@Field("facebookId") facebookId: String): Call<String>
-
-    @FormUrlEncoded
-    @POST("/login")
-    fun loginUser(@Field("id") id: String): Call<ContactData>
+    @POST("/checkRegistered")
+    fun checkRegistered(@Field("facebookId") facebookId: String): Call<String>
 
     @FormUrlEncoded
     @POST("/initGallery")
     // 나 빼고 다른 user들의 photos + 그 user 정보
     fun getGallery(@Field("id") id: String): Call<Pair<String,ContactData>>
+
+    @FormUrlEncoded
+    @POST("/upload")
+    fun uploadPhoto(@Field("id") id: String, @Field("photo") photo: String): Call<String>
 
 }

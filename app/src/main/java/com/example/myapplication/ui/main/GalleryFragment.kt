@@ -44,7 +44,7 @@ class GalleryHolder{
 var myGalleryHolder = GalleryHolder()
 var myGalleryList: ArrayList<GalleryItem> = ArrayList()
 
-var myContactData: ContactData = ContactData()
+lateinit var myId: String
 
 
 class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInterface {
@@ -58,7 +58,8 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
         savedInstanceState: Bundle?
     ): View? {
 
-        // main이 준 id로 myContactData 완성 (db에서 끌어옴)
+        // main에서 id받아오기
+        // myId = ~~~????????
 
         init()
 
@@ -114,7 +115,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
     fun init(){
         // 서버한테 요청
         for(i in 1..initNum) {
-            myService.getGallery(myContactData.facebookId)
+            myService.getGallery(myId)
                 .enqueue(object : Callback<Pair<String, ContactData>> {
                     override fun onFailure(
                         call: Call<Pair<String, ContactData>>, t: Throwable
@@ -159,10 +160,24 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                 // 갤러리에서 사진 불러오기
                 try{
                     var bitmap: Bitmap = MediaStore.Images.Media.getBitmap(getActivity()!!.getContentResolver(), dataUri)
-                    myContactData.photos?.add(Util.getStringFromBitmap(bitmap) as String)
-                    // 내 contact data에 올렸으니까 이거 db로 다시 올려야하는데 어떻게 보내지??
+                    var bitmapStr: String? = Util.getStringFromBitmap(bitmap)
 
-                    Toast.makeText(getContext(), "upload success", Toast.LENGTH_SHORT).show()
+                    myService.uploadPhoto(myId, bitmapStr!!).enqueue(object : Callback<String> {
+                        override fun onFailure(
+                            call: Call<String>, t: Throwable
+                        ) {
+                            Log.e("upload", t.message)
+                            Toast.makeText(getContext(), "upload fail", Toast.LENGTH_SHORT).show()
+                        }
+
+                        override fun onResponse(
+                            call: Call<String>, response: Response<String>
+                        ) {
+                            Log.d("upload", response.body())
+                            Toast.makeText(getContext(), "upload success", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+                    // 내 contact data에 올렸으니까 이거 db로 다시 올려야하는데 어떻게 보내지??
                 }catch (e:Exception){
                     Toast.makeText(getContext(), "$e", Toast.LENGTH_SHORT).show()
                 }

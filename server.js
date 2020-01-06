@@ -1,5 +1,6 @@
 // Import package
 var mongodb = require('mongodb');
+var socketio = require('socket.io');
 //var ObjectID = mongodb.ObjectID;
 var express = require('express')
 var bodyParser = require('body-parser')
@@ -111,14 +112,51 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             db.collection('user').find({'id':id},{'photos':1}).add(photo)
             response.json('add photo success');
             console.log('add photo success');
+        });
 
+        app.post('/checkRegistered', (request,response,next)=>{
+            var facebookId = request.body.facebookId;
+
+            var db = client.db('penstagram');
+
+            // check exists email
+            db.collection('user').find({'facebookId':facebookId}).count(function(err,number){
+                if(number!=0){
+                    // User is registered
+                    db.collection('user').findOne({},function(error,res){
+                        console.log(res._id)
+                        response.json(res._id)
+                        console.log('You have an account. Your id is '+res._id);
+                    })
+                }
+                else{
+                    // User is not registered
+                    response.json('not registered');
+                    console.log('You do not have an account('+facebookId+': false)');
+                }
+            })
         });
 
 
         // Start Web Server
-        app.listen(80, ()=>{
+        var server = app.listen(80, ()=>{
             console.log('Connected to MongoDB Server , WebService running on port 80');
         })
+
+        // 소켓 서버를 생성한다.
+        var io = socketio.listen(server);
+        io.sockets.on('connection', function (socket){
+            console.log('Socket ID : ' + socket.id + ', Connect');
+            socket.on('clientMessage', function(data){
+                console.log('Client Message : ' + data);
+
+                var message = {
+                    msg : 'server',
+                    data : 'data'
+                };
+                socket.emit('serverMessage', message);
+            });
+        });
     }
 })
 
