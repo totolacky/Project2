@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.activity_chat_corridor.*
 
 class ChatCorridorActivity : AppCompatActivity() {
 
-    internal lateinit var preferences: SharedPreferences
+    private lateinit var preferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,7 +18,6 @@ class ChatCorridorActivity : AppCompatActivity() {
         preferences = getSharedPreferences("USERSIGN", Context.MODE_PRIVATE)
         val editor = preferences!!.edit()
 
-
         //버튼을 클릭하면 입력한 이름을 쉐어드프리퍼런스에 내이름을 저장한다.
         //또한 그 이름을 가지고 채팅방으로 이동한다.
         button.setOnClickListener{
@@ -26,6 +25,5 @@ class ChatCorridorActivity : AppCompatActivity() {
             val intent = Intent(this, ChatRoomActivity::class.java)
             startActivity(intent)
         }
-
     }
 }
