@@ -25,6 +25,10 @@ interface MyService {
     fun checkRegistered(@Field("facebookId") facebookId: String): Call<String>
 
     @FormUrlEncoded
+    @POST("/addFriendFb")
+    fun addFriendFb(@Field("myFbId") myFbId: String, @Field("newFriendFbId") newFriendFbId: String): Call<String>
+
+    @FormUrlEncoded
     @POST("/initGallery")
     // 나 빼고 다른 user들의 photos + 그 user 정보
     fun getGallery(@Field("id") id: String): Call<Pair<String,ContactData>>
