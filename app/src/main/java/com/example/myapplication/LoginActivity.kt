@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.Retrofit.MyService
 import com.facebook.*
-import com.facebook.AccessToken
 import com.facebook.appevents.AppEventsLogger
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
@@ -170,6 +169,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data)
 
     }
+
     /****************************************************************************************************************
      * Facebook
      */
