@@ -45,9 +45,9 @@ class ContactAdapter(val context: Context, val contactList: ArrayList<ContactDat
             elem_status?.text = prof.status
 
             // 상태 메시지 없으면 이름 가운데로 옮기기
-            if (prof.status == null) {
-                elem_name.height = ViewGroup.LayoutParams.MATCH_PARENT
-            }
+//            if (prof.status == null) {
+//                elem_name.height = ViewGroup.LayoutParams.MATCH_PARENT
+//            }
 
             // 국기 설정
             val flagId = "flag_"+prof.country_code
@@ -56,7 +56,7 @@ class ContactAdapter(val context: Context, val contactList: ArrayList<ContactDat
 
             // 프로필 사진 설정
             var prof_photo = BitmapFactory.decodeResource(context.resources,R.drawable.def_icon)
-            if (prof.profile_photo != null) {
+            if (prof.profile_photo != "") {
                 prof_photo = Util.getBitmapFromString(prof.profile_photo!!)
             }
             elem_photo.setImageBitmap(Util.resizingBitmap(Util.squareBitmap(prof_photo),120))

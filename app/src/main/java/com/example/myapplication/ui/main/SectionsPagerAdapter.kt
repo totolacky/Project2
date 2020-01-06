@@ -16,16 +16,18 @@ private val TAB_TITLES = arrayOf(
  * A [FragmentPagerAdapter] that returns a fragment corresponding to
  * one of the sections/tabs/pages.
  */
-class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) :
+class SectionsPagerAdapter(private val context: Context, fm: FragmentManager, userId: String) :
     FragmentPagerAdapter(fm) {
+
+    val id = userId
 
     override fun getItem(position: Int): Fragment {
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
         when(position){
-            0 -> return ContactFragment()
-            1 -> return ChatFragment()
-            2 -> return GalleryFragment()
+            0 -> return ContactFragment.newInstance(id)
+            1 -> return ChatFragment.newInstance(id)
+            2 -> return GalleryFragment.newInstance(id)
             else -> return PlaceholderFragment()
         }
     }

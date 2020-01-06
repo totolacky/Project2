@@ -3,6 +3,8 @@ package com.example.myapplication
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
+import android.util.Log
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 
 
@@ -86,5 +88,23 @@ object Util {
         val decodedString =
             Base64.decode(stringPicture, Base64.DEFAULT)
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+    }
+
+    // Returns ContactData created from simple json string containing _id, name, profile_photo, status, country_cde
+    fun getContactDataFramSimpleJson(json: String): ContactData {
+        val jsonObject = JSONObject(json)
+        val contactData = ContactData()
+
+        Log.d("Util",json.toString())
+
+        contactData._id = jsonObject.getString("_id")
+        contactData.name = jsonObject.getString("name")
+        contactData.country_code = jsonObject.getInt("country_code")
+        contactData.profile_photo = jsonObject.getString("profile_photo")
+        contactData.status = jsonObject.getString("status")
+        if (contactData.status.equals("null"))
+            contactData.status = ""
+
+        return contactData
     }
 }
