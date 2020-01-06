@@ -151,7 +151,7 @@ class SignupActivity : AppCompatActivity() {
             var id: String? = null
 
             var retrofit = Retrofit.Builder()
-                .baseUrl("http://192.249.19.250:7980")
+                .baseUrl(Config.serverUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 

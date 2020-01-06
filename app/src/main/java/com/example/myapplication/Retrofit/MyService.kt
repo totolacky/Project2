@@ -26,12 +26,8 @@ interface MyService {
                  @Field("hashtag") hashtag: ArrayList<String>?): Call<String>
 
     @FormUrlEncoded
-    @GET("/checkRegistered")
-    fun checkRegisterd(@Field("facebookId") facebookId: String): Call<String>
-
-    @FormUrlEncoded
-    @POST("/login")
-    fun loginUser(@Field("id") id: String): Call<ContactData>
+    @POST("/checkRegistered")
+    fun checkRegistered(@Field("facebookId") facebookId: String): Call<String>
 
     @FormUrlEncoded
     @POST("/initGallery")

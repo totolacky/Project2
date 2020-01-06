@@ -23,7 +23,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
 
-
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
     ////FacebookLogin
@@ -56,7 +55,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
         var userName: String = ""
         var userId: String = ""
-
 
         LoginManager.getInstance().registerCallback(mFacebookCallbackManager,
             object : FacebookCallback<LoginResult> {
@@ -93,25 +91,39 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         //val isLoggedIn = accessToken != null && !accessToken.isExpired
 
         var retrofit = Retrofit.Builder()
-            .baseUrl("http://192.249.19.251:9080")
+            .baseUrl(Config.serverUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         var myService: MyService = retrofit.create(MyService::class.java)
 
-
         // register
         var registerBtn: Button = findViewById(R.id.registerBtn)
         registerBtn.setOnClickListener {
             if(userId!="" && userName!="") {
-                // 서버로 register 전송
-                myService.registerUser(userId, userName).enqueue(object: Callback<String>{
+                // 이미 로그인이 되어 있다면 register 시작
+                myService.checkRegistered(userId).enqueue(object: Callback<String>{
                     override fun onFailure(call: Call<String>, t: Throwable){
-                        Log.e("register",t.message)
-                        Toast.makeText(applicationContext, "register fail", Toast.LENGTH_SHORT).show()
+                        Log.e("LoginActivity","Register failed with error. "+t.message)
+                        Toast.makeText(applicationContext, "Cannot register", Toast.LENGTH_SHORT).show()
                     }
                     override fun onResponse(call: Call<String>, response: Response<String>){
-                        Log.d("register",response.body())
+                        Log.d("LoginActivity","Register response arrived. Response: "+response.body())
+                        if(response.body()?.equals("not registered")!!){
+                            val contactData = ContactData()
+                            contactData.name = userName
+                            contactData.facebookId = userId
+
+                            val intent = Intent(applicationContext, SignupActivity::class.java)
+                            intent.putExtra("pageNum",0)
+                            intent.putExtra("contactData", contactData)
+                            startActivity(intent)
+                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                            finish()
+                        } else {
+                            Toast.makeText(applicationContext, "You already have an accout.", Toast.LENGTH_SHORT).show()
+                            Log.d("LoginActivity","You already have an account. id: "+response.body())
+                        }
                     }
                 })
 
@@ -127,29 +139,29 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         loginBtn.setOnClickListener {
             if(userId!=""){
                 // 서버로 login 전송
-                myService.loginUser(userId).enqueue(object: Callback<ContactData>{
-                    override fun onFailure(call: Call<ContactData>, t: Throwable){
-                        Log.e("login",t.message)
-                        Toast.makeText(applicationContext, "login fail", Toast.LENGTH_SHORT).show()
+                myService.checkRegistered(userId).enqueue(object: Callback<String>{
+                    override fun onFailure(call: Call<String>, t: Throwable){
+                        Log.e("LoginActivity","Login failed with error. "+t.message)
+                        Toast.makeText(applicationContext, "Cannot login", Toast.LENGTH_SHORT).show()
                     }
-                    override fun onResponse(call: Call<ContactData>, response: Response<ContactData>){
-                        Log.d("login",response.body()!!.facebookId)
-
-                        // 메인으로 돌아가기
-                        val intent = Intent(applicationContext, MainActivity::class.java)
-                        intent.putExtra("id", userId)
-                        startActivity(intent)
+                    override fun onResponse(call: Call<String>, response: Response<String>){
+                        if (response.body()?.equals("not registered")!!) {
+                            Toast.makeText(applicationContext, "You do not have an accout. Register first.", Toast.LENGTH_SHORT).show()
+                            Log.d("LoginActivity","You do not have an account. response: "+response.body())
+                        } else {
+                            val intent = Intent(applicationContext, MainActivity::class.java)
+                            intent.putExtra("id", response.body())
+                            startActivity(intent)
+                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                            finish()
+                        }
                     }
                 })
-                Log.d("loginBtn","send id to server")
             }
             else {
-                Toast.makeText(applicationContext, "login in Facebook first", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "Log in to Facebook first", Toast.LENGTH_SHORT).show()
             }
         }
-
-
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
