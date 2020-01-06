@@ -22,4 +22,12 @@ interface MyService {
     // 나 빼고 다른 user들의 photos + 그 user 정보
     fun getGallery(@Field("id") id: String): Call<Pair<String,ContactData>>
 
+    @FormUrlEncoded
+    @POST("/upload")
+    fun uploadPhoto(@Field("id") id: String, @Field("photo") photo: String): Call<String>
+
+
+
+
+
 }

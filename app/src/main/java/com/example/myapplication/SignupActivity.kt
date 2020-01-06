@@ -159,7 +159,7 @@ class SignupActivity : AppCompatActivity() {
             //profileImage.setImageURI(data.data)
             val bm = MediaStore.Images.Media.getBitmap(contentResolver, data.data)
             profileImage.setImageBitmap(bm)
-            (contactData as ContactData).profile_photo = bm
+            (contactData as ContactData).profile_photo = Util.getStringFromBitmap(bm)
         }
     }
 }
