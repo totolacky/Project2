@@ -1,6 +1,7 @@
 package com.example.myapplication.Retrofit
 
 import com.example.myapplication.ContactData
+import com.example.myapplication.GalleryData
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.Field
@@ -27,6 +28,7 @@ interface MyService {
     // facebook id 보내면 이미 가입했는지 여부 보내줌
     fun checkRegistered(@Field("facebookId") facebookId: String): Call<String>
 
+
     @FormUrlEncoded
     @POST("/addFriendFb")
     // 나와 새 친구의 facebook id를 보내면 서로 친구추가
@@ -45,7 +47,7 @@ interface MyService {
     @FormUrlEncoded
     @POST("/initGallery")
     // 나 빼고 다른 user들의 photos + 그 user 정보
-    fun getGallery(@Field("id") id: String): Call<Pair<String,ContactData>>
+    fun getGallery(@Field("id") id: String): Call<GalleryData>
 
     @FormUrlEncoded
     @POST("/upload")

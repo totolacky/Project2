@@ -48,8 +48,10 @@ class ContactFragment : Fragment() {
          * number.
          */
         @JvmStatic
-        fun newInstance(): ContactFragment {
-            return ContactFragment()
+        fun newInstance(id: String): ContactFragment {
+            var newCF = ContactFragment()
+            newCF.userId = id
+            return newCF
         }
     }
 

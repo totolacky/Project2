@@ -12,9 +12,7 @@ import com.example.myapplication.R
  */
 class ChatFragment : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    var userId = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,15 +26,18 @@ class ChatFragment : Fragment() {
          * The fragment argument representing the section number for this
          * fragment.
          */
-        private const val ARG_SECTION_NUMBER = "section_number"
 
         /**
          * Returns a new instance of this fragment for the given section
          * number.
          */
         @JvmStatic
-        fun newInstance(): ChatFragment {
-            return ChatFragment()
+        fun newInstance(id: String): ChatFragment {
+            var newCF = ChatFragment()
+            newCF.userId = id
+            return newCF
         }
     }
+
+
 }

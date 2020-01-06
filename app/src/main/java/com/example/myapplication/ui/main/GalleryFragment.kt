@@ -18,6 +18,7 @@ import com.example.myapplication.*
 import com.example.myapplication.Config.serverUrl
 import com.example.myapplication.Retrofit.MyService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.android.synthetic.main.fragment_gallery.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -45,7 +46,6 @@ class GalleryHolder{
 var myGalleryHolder = GalleryHolder()
 var myGalleryList: ArrayList<GalleryItem> = ArrayList()
 
-lateinit var myId: String
 
 
 class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInterface {
@@ -54,13 +54,41 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
 
     lateinit var rootView : View
 
+
+    var myId = ""
+
+    companion object {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        @JvmStatic
+        fun newInstance(id: String): GalleryFragment {
+            var newGF = GalleryFragment()
+            newGF.myId = id
+            return newGF
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
         // main에서 id받아오기
-        // myId = ~~~????????
+        /*var bundle: Bundle? = getArguments()
+        if(bundle!=null){
+            Log.d("GalleryFragment","get bundle (not null)")
+            myId = bundle.getString("id")
+        }
+        else{
+            Log.d("GalleryFragment","bundle is null")
+        }*/
 
         init()
 
@@ -117,19 +145,21 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
         // 서버한테 요청
         for(i in 1..initNum) {
             myService.getGallery(myId)
-                .enqueue(object : Callback<Pair<String, ContactData>> {
+                .enqueue(object : Callback<GalleryData> {
                     override fun onFailure(
-                        call: Call<Pair<String, ContactData>>, t: Throwable
+                        call: Call<GalleryData>, t: Throwable
                     ) {
                         Log.e("gallery", t.message)
                         Toast.makeText(getContext(), "get gallery fail", Toast.LENGTH_SHORT).show()
                     }
 
                     override fun onResponse(
-                        call: Call<Pair<String, ContactData>>, response: Response<Pair<String, ContactData>>
+                        call: Call<GalleryData>, response: Response<GalleryData>
                     ) {
                         Log.d("gallery", "init response ok")
-                        myGalleryList.add(GalleryItem(Util.getBitmapFromString(response.body()!!.first), response.body()!!.second))
+                        if(response.body()==null) Log.d("gallery","response body is null")
+                        Log.d("gallery",response.body()?.selectedPhoto)
+                        myGalleryList.add(GalleryItem(Util.getBitmapFromString(response.body()!!.selectedPhoto), response.body()!!.userContactData))
                     }
                 })
         }
