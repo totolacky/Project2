@@ -1,5 +1,6 @@
 // Import package
 var mongodb = require('mongodb');
+var mongoose = require('mongoose');
 var socketio = require('socket.io');
 //var ObjectID = mongodb.ObjectID;
 var express = require('express')
@@ -23,7 +24,7 @@ var url = 'mongodb://localhost:27017'
 MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
     if(err) console.log('Unable to connection to the mongoDB server.Error', err);
     else{
-        
+
         app.post('/login', (request,response,next)=>{
             var post_data = request.body;
 
@@ -88,6 +89,8 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             if(friends == null) { friends = [] }
             if(hashtag == null) { hashtag = [] }
             if(chatroom == null) { chatroom = [] }
+            if(status == null) { status = "" }
+            if(profile_photo == null) { profile_photo = "" }
 
 
             var insertJson = {
@@ -193,21 +196,26 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                                         var myFriends = user_me.friends
                                         var friendFriends = user_friend.friends
 
-                                        myFriends.push(user_friend._id)
-                                        friendFriends.push(user_me._id)
+                                        if (myFriends.includes(user_friend._id.toString())) {
+                                            response.json('You are already friends.')
+                                            console.log('You are already friends.');
+                                        }
+                                        else {
+                                            myFriends.push(""+user_friend._id)
+                                            friendFriends.push(""+user_me._id)
 
-                                        db.collection('user').updateOne({'facebookId':myFbId},{$set: {'friends':myFriends}},function(err,res){
-                                            if(err) throw err
-                                            console.log('updated')
-                                        });
-                                        db.collection('user').updateOne({'facebookId':fbId},{$set: {'friends':friendFriends}},function(err,res){
-                                            if(err) throw err
-                                            console.log('updated')
-                                        });
+                                            db.collection('user').updateOne({'facebookId':myFbId},{$set: {'friends':myFriends}},function(err,res){
+                                                if(err) throw err
+                                                console.log('updated')
+                                            });
+                                            db.collection('user').updateOne({'facebookId':fbId},{$set: {'friends':friendFriends}},function(err,res){
+                                                if(err) throw err
+                                                console.log('updated')
+                                            });
 
-                                        response.json('Success')
-                                        console.log('Friend added: ' + user_me.name + ' and ' + user_friend.name);
-
+                                            response.json('Success')
+                                            console.log('Friend added: ' + user_me.name + ' and ' + user_friend.name);
+                                        }
                                     });
                                 }
                             });
@@ -216,6 +224,70 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                 });
             }
 
+        });
+
+        app.post('/getFriends', (request,response,next)=>{
+            var _id = request.body.id;
+
+            var db = client.db('penstagram');
+
+            // check exists email
+            db.collection('user').find({'_id':mongoose.mongo.ObjectID(_id)}).count(function(err,number){
+                if(number!=0){
+                    // User is registered
+                    db.collection('user').findOne({},function(error,res){
+                        console.log(res.friends)
+                        response.json(res.friends)
+                        console.log('Friends sent.');
+                    })
+                }
+                else{
+                    // User is not registered
+                    response.json('not registered');
+                    console.log('You do not have an account('+_id+': false)');
+                }
+            })
+        });
+
+        app.post('/getContactSimple', (request,response,next)=>{
+            console.log('aaaaaaaaaaa')
+
+            var _id = request.body.id;
+            console.log("getContactSimple called with id: "+_id)
+
+            var db = client.db('penstagram');
+
+            // check exists id
+            db.collection('user').find({'_id':mongoose.mongo.ObjectID(_id)}).count(function(err,number){
+                if(number!=0){
+                    // User is registered
+                    console.log('User is registered.');
+                    db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(_id)},function(error,res){
+                        if(error) console.log(error)
+                        else {
+                            //console.log(res.friends)
+
+                            console.log(res)
+                            var resultJson = {
+                                '_id': res._id,
+                                'name': res.name,
+                                'status': res.status,
+                                'country_code': res.country_code,
+                                'profile_photo': res.profile_photo
+                            };
+
+                            response.json(JSON.stringify(resultJson))
+                            console.log(JSON.stringify(resultJson))
+                            console.log('Friends sent.');
+                        }
+                    })
+                }
+                else{
+                    // User is not registered
+                    response.json('not registered');
+                    console.log('You do not have an account('+_id+': false)');
+                }
+            })
         });
 
         // Start Web Server
