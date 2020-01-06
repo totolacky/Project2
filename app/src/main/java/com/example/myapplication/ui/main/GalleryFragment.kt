@@ -24,6 +24,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.concurrent.thread
 
 
 class GalleryHolder{
@@ -130,13 +131,6 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
         startActivity(intent)
     }
 
-    var retrofit = Retrofit.Builder()
-        .baseUrl(serverUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    var myService: MyService = retrofit.create(MyService::class.java)
-
 
     var initNum: Int = 5
 
@@ -144,7 +138,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
     fun init(){
         // 서버한테 요청
         for(i in 1..initNum) {
-            myService.getGallery(myId)
+            /*myService.getGallery(myId)
                 .enqueue(object : Callback<GalleryData> {
                     override fun onFailure(
                         call: Call<GalleryData>, t: Throwable
@@ -161,7 +155,24 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                         Log.d("gallery",response.body()?.selectedPhoto)
                         myGalleryList.add(GalleryItem(Util.getBitmapFromString(response.body()!!.selectedPhoto), response.body()!!.userContactData))
                     }
-                })
+                })*/
+
+            var tmpThread = thread(start = true){
+                var retrofit = Retrofit.Builder()
+                    .baseUrl(serverUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+
+                var myService: MyService = retrofit.create(MyService::class.java)
+
+                var response = myService.getGallery(myId).execute()
+                if(response.body()==null) Log.d("gallery","response body is null")
+                Log.d("gallery",response.body()?.selectedPhoto)
+                myGalleryList.add(GalleryItem(Util.getBitmapFromString(response.body()!!.selectedPhoto), response.body()!!.userContactData))
+
+            }
+
+            tmpThread.join()
         }
         myGalleryHolder.setDataList(myGalleryList)
         Log.d("init gallery","other users' photos and ContactDatas")
@@ -193,7 +204,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                     var bitmap: Bitmap = MediaStore.Images.Media.getBitmap(getActivity()!!.getContentResolver(), dataUri)
                     var bitmapStr: String? = Util.getStringFromBitmap(bitmap)
 
-                    myService.uploadPhoto(myId, bitmapStr!!).enqueue(object : Callback<String> {
+                    /*myService.uploadPhoto(myId, bitmapStr!!).enqueue(object : Callback<String> {
                         override fun onFailure(
                             call: Call<String>, t: Throwable
                         ) {
@@ -204,11 +215,27 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                         override fun onResponse(
                             call: Call<String>, response: Response<String>
                         ) {
-                            Log.d("upload", response.body())
-                            Toast.makeText(getContext(), "upload success", Toast.LENGTH_SHORT).show()
+
                         }
                     })
-                    // 내 contact data에 올렸으니까 이거 db로 다시 올려야하는데 어떻게 보내지??
+                    // 내 contact data에 올렸으니까 이거 db로 다시 올려야하는데 어떻게 보내지??*/
+
+                    var tmpThread = thread(start = true){
+                        var retrofit = Retrofit.Builder()
+                            .baseUrl(Config.serverUrl)
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build()
+
+                        var myService: MyService = retrofit.create(MyService::class.java)
+
+                        var response = myService.uploadPhoto(myId, bitmapStr!!).execute()
+                        Log.d("upload", response.body())
+                        Toast.makeText(getContext(), "upload success", Toast.LENGTH_SHORT).show()
+
+                    }
+
+                    tmpThread.join()
+
                 }catch (e:Exception){
                     Toast.makeText(getContext(), "$e", Toast.LENGTH_SHORT).show()
                 }
