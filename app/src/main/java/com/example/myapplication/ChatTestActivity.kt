@@ -25,7 +25,7 @@ class ChatTestActivity : AppCompatActivity() {
         try {
             //IO.socket 메소드는 은 저 URL 을 토대로 클라이언트 객체를 Return 합니다.
             // Socket.io Client tool: https://amritb.github.io/socketio-client-tool/#url=aHR0cDovLzE5Mi4yNDkuMTkuMjUwOjc5ODA=&opt=&events=
-            mSocket = IO.socket("http://localhost")
+            mSocket = IO.socket("http://192.249.19.250:7980")
             Log.d("ChatTestActivity","no syntax error in URL")
         } catch (e: URISyntaxException) {
             Log.e("ChatTestActivity-error", e.reason)

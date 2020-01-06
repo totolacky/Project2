@@ -5,17 +5,29 @@ import com.example.myapplication.ContactData
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface MyService {
 
     @FormUrlEncoded
-    @POST("/register")
+    @POST("/registerUser")
     fun registerUser(@Field("id") id: String, @Field("name") name: String): Call<String>
 
     @FormUrlEncoded
-    @POST("/login")
-    fun loginUser(@Field("id") id: String): Call<ContactData>
+    @POST("/register")
+    fun register(@Field("facebookId") facebookId: String,
+                 @Field("name") name: String,
+                 @Field("status") status: String?,
+                 @Field("country_code") country_code: Int,
+                 @Field("profile_photo") profile_photo: String?,
+                 @Field("photos") photos: ArrayList<String>?,
+                 @Field("friends") friends: ArrayList<String>?,
+                 @Field("hashtag") hashtag: ArrayList<String>?): Call<String>
+
+    @FormUrlEncoded
+    @POST("/checkRegistered")
+    fun checkRegistered(@Field("facebookId") facebookId: String): Call<String>
 
     @FormUrlEncoded
     @POST("/initGallery")

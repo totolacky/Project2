@@ -52,7 +52,7 @@
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/statusEditText"
         android:layout_width="360dp"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_marginBottom="248dp"
         android:gravity="center"
         android:hint="So happy :)"

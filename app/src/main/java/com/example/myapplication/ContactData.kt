@@ -1,6 +1,5 @@
 package com.example.myapplication
 
-import android.graphics.Bitmap
 import java.io.Serializable
 
 data class ContactData(var facebookId: String = "",
