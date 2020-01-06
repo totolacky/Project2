@@ -24,7 +24,6 @@ var url = 'mongodb://localhost:27017'
 MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
     if(err) console.log('Unable to connection to the mongoDB server.Error', err);
     else{
-
         app.post('/login', (request,response,next)=>{
             var post_data = request.body;
 
@@ -102,7 +101,8 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                 'photos': photos,
                 'friends': friends,
                 'hashtag': hashtag,
-                'chatroom': chatroom
+                'chatroom': chatroom,
+                'chat_people': []
             };
 
             var db = client.db('penstagram');
@@ -236,7 +236,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                 if(number!=0){
                     // User is registered
                     db.collection('user').findOne({},function(error,res){
-                        console.log(res.friends)
+                        console.log(res)
                         response.json(res.friends)
                         console.log('Friends sent.');
                     })
@@ -288,6 +288,209 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                     console.log('You do not have an account('+_id+': false)');
                 }
             })
+        });
+
+        app.post('/getChatrooms', (request,response,next)=>{
+            var _id = request.body.id;
+
+            var db = client.db('penstagram');
+
+            // check exists email
+            db.collection('user').find({'_id':mongoose.mongo.ObjectID(_id)}).count(function(err,number){
+                if(number!=0){
+                    // User is registered
+                    db.collection('user').findOne({},function(error,res){
+                        console.log(res.chatroom)
+                        response.json(res.chatroom)
+                        console.log('Friends sent.');
+                    })
+                }
+                else{
+                    // User is not registered
+                    response.json('not registered');
+                    console.log('You do not have an account('+_id+': false)');
+                }
+            })
+        });
+
+        app.post('/getChatroom', (request,response,next)=>{
+
+            var chatroom_id = request.body.id;
+            console.log("getChatroom called with id: "+chatroom_id)
+
+            var db = client.db('penstagram');
+
+            // check exists id
+            db.collection('chatroom').find({'_id':mongoose.mongo.ObjectID(chatroom_id)}).count(function(err,number){
+                if(number!=0){
+                    // Chatroom exists
+                    console.log('Chatroom exists.');
+                    db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(chatroom_id)},function(error,res){
+                        if(error) console.log(error)
+                        else {
+                            //console.log(res.friends)
+
+                            console.log(res)
+                            var resultJson = {
+                                'chatroom_id': res.chatroom_id,
+                                'chatroom_name': res.chatroom_name,
+                                'last_chat': res.last_chat,
+                                'chatroom_image': res.chatroom_image,
+                                'people': res.people,
+                                'chat':res.chat
+                            };
+
+                            response.json(JSON.stringify(resultJson))
+                            console.log(JSON.stringify(resultJson))
+                            console.log('Chatroom sent.');
+                        }
+                    })
+                }
+                else{
+                    // Chatroom does not exist
+                    response.json('no such chatroom');
+                    console.log('no such chatroom');
+                }
+            })
+        });
+
+        app.post('/createChatroom', (request,response,next)=>{
+            var myId = request.body.myId;
+            var yourId = request.body.yourId;
+
+            var db = client.db('penstagram');
+
+            // Check if both users exist
+            db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(myId)}, function(error,user_me){
+                if (err) console.log('error in createChatroom: no user_me')
+                else {
+                    db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(yourId)}, function(error,user_you){
+                        if (err) console.log('error in createChatroom: no user_you')
+                        else {
+                            // When both users exist
+                            if(user_me.chat_people.includes(yourId)) {
+                                var index= user_me.chat_people.indexOf(yourId)
+                                var chatroomId = user_me.chatroom[index]
+                                response.json(chatroomId)
+                                console.log('Chatroom exists. Responded with chatroom id '+chatroomId)
+                            } else {
+                                var insertJson = {
+                                    'chatroom_name': "",
+                                    'last_chat': "",
+                                    'chatroom_image':"",
+                                    'people':[myId,yourId],
+                                    'chat':[]
+                                };
+                                db.collection('chatroom').insertOne(insertJson,function(error,res){
+                                    // When both users exist
+                                    console.log("add chatroom: "+user_me.name+" and "+user_you.name)
+
+                                    var chatroomId = res.ops[0]._id
+
+                                    user_me.chatroom.push(chatroomId.toString())
+                                    user_you.chatroom.push(chatroomId.toString())
+
+                                    user_me.chat_people.push(user_you._id.toString())
+                                    user_you.chat_people.push(user_me._id.toString())
+
+                                    // Update DB
+                                    db.collection('user').updateOne({'_id':mongoose.mongo.ObjectID(myId)},{$set: {'chatroom':user_me.chatroom, 'chat_people':user_me.chat_people}},function(err,res){
+                                        if(err) throw err
+                                        console.log('my DB updated')
+                                    });
+
+                                    db.collection('user').updateOne({'_id':mongoose.mongo.ObjectID(yourId)},{$set: {'chatroom':user_you.chatroom, 'chat_people':user_you.chat_people}},function(err,res){
+                                        if(err) throw err
+                                        console.log('my DB updated')
+                                    });
+
+                                    response.json(chatroomId);
+                                    console.log('Chatroom created with id: '+chatroomId);
+                                })
+                            }
+                        }
+                    })
+                }
+            })
+
+
+
+
+
+
+
+            // if(myId.chat_people.includes(yourId)){
+            //     db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(myId)}, function(error,res){
+            //         if (err) console.log('error in createChatroom')
+            //         else {
+            //             var index= res.chat_people.findIndex(yourId)
+            //             var chatroomId = res.chatroom[index]
+            //             response.json(chatroomId)
+            //             console.log('Chatroom exists. Responded with chatroom id '+chatroomId)
+            //         }
+            //     })
+            // } else {
+            //     var insertJson = {
+            //         'chatroom_name': "",
+            //         'last_chat': "",
+            //         'chatroom_image':"",
+            //         'people':[myId,yourId],
+            //         'chat':[]
+            //     };
+
+            //     db.collection('chatroom').insertOne(insertJson,function(error,res){
+            //         db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(myId)}, function(error,user_me){
+            //             if (err) console.log('error in createChatroom: no user_me')
+            //             else {
+            //                 db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(yourId)}, function(error,user_you){
+            //                     if (err) console.log('error in createChatroom: no user_you')
+            //                     else {
+            //                         // When both users exist
+            //                         console.log("add chatroom: "+user_me.name+" and "+user_you.name)
+
+            //                         var chatroomId = res.ops[0]._id
+
+            //                         user_me.chatroom.push(chatroomId)
+            //                         user_you.chatroom.push(chatroomId)
+
+            //                         user_me.chat_people[user_you] = chatroomId
+            //                         user_you.chat_people[user_me] = chatroomId
+
+            //                         // Update DB
+            //                         db.collection('user').updateOne({'_id':mongoose.mongo.ObjectID(myId)},{$set: {'chatroom':user_me.chatroom, 'chat_people':user_me.chat_people}},function(err,res){
+            //                             if(err) throw err
+            //                             console.log('my DB updated')
+            //                         });
+
+            //                         db.collection('user').updateOne({'_id':mongoose.mongo.ObjectID(yourId)},{$set: {'chatroom':user_you.chatroom, 'chat_people':user_you.chat_people}},function(err,res){
+            //                             if(err) throw err
+            //                             console.log('my DB updated')
+            //                         });
+
+            //                         response.json(chatroomId);
+            //                         console.log('Chatroom created with id: '+chatroomId);
+            //                     }
+            //                 })
+            //             }
+            //         })
+            //     })
+            // }
+
+            // db.collection('chatroom').find({'_id':mongoose.mongo.ObjectID(_id)}).count(function(err,number){
+            //     if(number!=0){
+            //         // User is registered
+            //         db.collection('user').findOne({},function(error,res){
+            //             console.log(res.chatroom)
+            //             response.json(res.chatroom)
+            //             console.log('Friends sent.');
+            //         })
+            //     }
+            //     else{
+            //         // User is not registered
+            //         response.json('not registered');
+            //         console.log('You do not have an account('+_id+': false)');
+            //     }
+            // })
         });
 
         // Start Web Server
