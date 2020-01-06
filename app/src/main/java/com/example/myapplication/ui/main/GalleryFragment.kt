@@ -15,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.*
 import com.example.myapplication.*
+import com.example.myapplication.Config.serverUrl
 import com.example.myapplication.Retrofit.MyService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import retrofit2.Call
@@ -102,7 +103,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
     }
 
     var retrofit = Retrofit.Builder()
-        .baseUrl("http://192.249.19.251:9080")
+        .baseUrl(serverUrl)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
