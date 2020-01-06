@@ -194,7 +194,10 @@ class SignupActivity : AppCompatActivity() {
             //profileImage.setImageURI(data.data)
             val bm = MediaStore.Images.Media.getBitmap(contentResolver, data.data)
             profileImage.setImageBitmap(bm)
-            contactData.profile_photo = Util.getStringFromBitmap(bm)
+            contactData.profile_photo = when (bm) {
+                null -> ""
+                else -> Util.getStringFromBitmap(bm)!!
+            }
         }
     }
 }
