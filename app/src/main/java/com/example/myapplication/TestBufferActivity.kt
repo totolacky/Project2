@@ -8,13 +8,13 @@ class TestBufferActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        val nextIntent = Intent(this, SignupActivity::class.java)
-        nextIntent.putExtra("pageNum",0)
-        nextIntent.putExtra("contactData",ContactData())
+        var nextIntent = Intent(this, MainActivity::class.java)
+        nextIntent.putExtra("id", "5e1339297aba722eeba7adab")
 
         startActivity(nextIntent)
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.slide_in_left)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         finish()
     }
 }

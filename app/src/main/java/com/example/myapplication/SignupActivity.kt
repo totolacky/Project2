@@ -166,7 +166,8 @@ class SignupActivity : AppCompatActivity() {
                 contactData.profile_photo,
                 contactData.photos,
                 contactData.friends,
-                contactData.hashtag
+                contactData.hashtag,
+                contactData.chatroom
             ).enqueue(object: Callback<String> {
                 override fun onFailure(call: Call<String>, t: Throwable){
                     Log.e("register",t.message)
@@ -193,7 +194,10 @@ class SignupActivity : AppCompatActivity() {
             //profileImage.setImageURI(data.data)
             val bm = MediaStore.Images.Media.getBitmap(contentResolver, data.data)
             profileImage.setImageBitmap(bm)
-            contactData.profile_photo = Util.getStringFromBitmap(bm)
+            contactData.profile_photo = when (bm) {
+                null -> ""
+                else -> Util.getStringFromBitmap(bm)!!
+            }
         }
     }
 }

@@ -1,22 +1,29 @@
 package com.example.myapplication.ui.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.myapplication.Config
 import com.example.myapplication.ContactData
 import com.example.myapplication.R
+import com.example.myapplication.Retrofit.MyService
+import com.example.myapplication.Util
 import kotlinx.android.synthetic.main.fragment_contact.*
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.concurrent.thread
 
 /**
  * The address fragment.
  */
 class ContactFragment : Fragment() {
 
-    var userId = ""
+    val id = "5e136121b4733f33b0697ea3"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,26 +72,42 @@ class ContactFragment : Fragment() {
 
     fun getContactList(): ArrayList<ContactData?>? {
         // Fetch contact list from server
+        var idList: ArrayList<String>? = ArrayList()
+        var resList: ArrayList<ContactData?> = ArrayList()
+        var tmpThread: Thread
 
-        // Default arraylist
-        val arrayList = ArrayList<ContactData?>()
+        tmpThread = thread(start = true){
+            var retrofit = Retrofit.Builder()
+                .baseUrl(Config.serverUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
 
-        arrayList.add(ContactData("0","Tom",null,0,null,null,null,null))
-        arrayList.add(ContactData("1","Mike","feel like Mike",0,null,null,null,null))
-        arrayList.add(ContactData("2","Henry","feel like Henry",0,null,null,null,null))
-        arrayList.add(ContactData("3","Alice","feel sooooo Alice",0,null,null,null,null))
-        arrayList.add(ContactData("4","Julia","hehe",0,null,null,null,null))
-        arrayList.add(ContactData("5","Daniel",null,0,null,null,null,null))
-        arrayList.add(ContactData("6","Steve",null,0,null,null,null,null))
-        arrayList.add(ContactData("7","Sophie","hi",0,null,null,null,null))
-        arrayList.add(ContactData("8","Timothy","heyy",0,null,null,null,null))
-        arrayList.add(ContactData("9","Julien","yo",0,null,null,null,null))
-        arrayList.add(ContactData("10","Kevin","hehehehehe",0,null,null,null,null))
-        arrayList.add(ContactData("11","Jake",null,0,null,null,null,null))
-        arrayList.add(ContactData("12","Jane","null?",0,null,null,null,null))
+            var myService: MyService = retrofit.create(MyService::class.java)
 
+            idList = myService.getFriends(id).execute().body()
+            Log.d("ContactFragment","idList is $idList")
+        }
 
-        return arrayList
+        tmpThread.join()
+
+        for (elem_id in idList!!) {
+            tmpThread = thread(start = true){
+                Log.d("ContactFragment","get contactdata - id is $elem_id")
+                var retrofit = Retrofit.Builder()
+                    .baseUrl(Config.serverUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+
+                var myService: MyService = retrofit.create(MyService::class.java)
+
+                var body = myService.getContactSimple(elem_id).execute().body()
+                Log.d("ContactFragment","get contactdata - body is $body")
+                resList.add(Util.getContactDataFramSimpleJson(body!!))
+            }
+            tmpThread.join()
+        }
+
+        return resList
     }
 
 }
