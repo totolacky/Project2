@@ -22,8 +22,7 @@ var url = 'mongodb://localhost:27017'
 
 MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
     if(err) console.log('Unable to connection to the mongoDB server.Error', err);
-    else{
-        
+    else{        
         app.post('/login', (request,response,next)=>{
             var post_data = request.body;
 
@@ -53,22 +52,44 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
 
             var db = client.db('penstagram');
 
-            // Pair<Bitmap(String),ContactData>
             // user 랜덤 선택 (id ㄴㄴ) -> photo 랜덤 선택
-            var query = {'id':{$ne:id}};
-            var totalCnt = db.collection('user').count();
-            var skipSize = Math.floor(Math.random()*totalCnt);
-            var selectUser = db.collection('user').find(query).skip(skipSize).limit(1);
+            var query = {'_id':{$ne:id}};
+            var totalCnt = db.collection('user').find(query).count(function(err,number){
 
-            var projection = {'photos':1,'_id':0};
-            var photoArray = db.collection('user').find(query, projection).skip(skipSize).limit(1);
-            var randNum = Math.floor(Math.random()*photoArray.size);
-            var selectedPhoto = photoArray[randNum];
+                var skipSize = Math.floor(Math.random()*number);
+                var selectedUser = db.collection('user').find(query).skip(skipSize).limit(1).toArray(function(err,selectedUser){
 
-            var userContactData = selectUser.body
+                    var userContactData = {
+                        'facebookId': selectedUser[0].facebookId,
+                        'name': selectedUser[0].name,
+                        'status': selectedUser[0].status,
+                        'country_code': selectedUser[0].country_code,
+                        'profile_photo':selectedUser[0].profile_photo,
+                        'photos': selectedUser[0].photos,
+                        'friends': selectedUser[0].friends,
+                        'hashtag': selectedUser[0].hashtag,
+                    };
+    
+                    console.log(userContactData.name)
+    
+                    var selectedPhoto=""
+    
+                    var photoArray = selectedUser[0].photos;
+                    if(photoArray != null){
+                        var randNum = Math.floor(Math.random()*photoArray.length);
+                        selectedPhoto = photoArray[randNum]
+                    }
+                    else{
+                        console.log('photoArray null');  
+                    }
+    
+                    response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
+                    console.log('Send data to init gallery success');  
+                });
 
-            response.json({'Pair()':{selectedPhoto, userContactData}});
-            console.log('Send data to init gallery success');
+
+            });
+
         });
 
         app.post('/register', (request,response,next)=>{
