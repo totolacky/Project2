@@ -15,6 +15,26 @@ import com.example.myapplication.R
  */
 class ChatFragment : Fragment() {
 
+    var userId = ""
+
+    companion object {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        @JvmStatic
+        fun newInstance(id: String): ChatFragment {
+            var newCF = ChatFragment()
+            newCF.userId = id
+            return newCF
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,20 +49,4 @@ class ChatFragment : Fragment() {
         return root
     }
 
-    companion object {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private const val ARG_SECTION_NUMBER = "section_number"
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        @JvmStatic
-        fun newInstance(): ChatFragment {
-            return ChatFragment()
-        }
-    }
 }

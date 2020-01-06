@@ -1,6 +1,7 @@
 package com.example.myapplication.Retrofit
 
 import com.example.myapplication.ContactData
+import com.example.myapplication.GalleryData
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -23,10 +24,11 @@ interface MyService {
     @POST("/checkRegistered")
     fun checkRegistered(@Field("facebookId") facebookId: String): Call<String>
 
+
     @FormUrlEncoded
     @POST("/initGallery")
     // 나 빼고 다른 user들의 photos + 그 user 정보
-    fun getGallery(@Field("id") id: String): Call<Pair<String,ContactData>>
+    fun getGallery(@Field("id") id: String): Call<GalleryData>
 
     @FormUrlEncoded
     @POST("/upload")

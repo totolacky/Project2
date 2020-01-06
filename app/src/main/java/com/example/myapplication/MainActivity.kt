@@ -1,57 +1,69 @@
 package com.example.myapplication
 
-import android.app.PendingIntent.getActivity
+import android.app.Fragment
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.tabs.TabLayout
-import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.Toast
+import androidx.viewpager.widget.ViewPager
 import com.example.myapplication.Retrofit.MyService
+import com.example.myapplication.ui.main.GalleryFragment
 import com.example.myapplication.ui.main.SectionsPagerAdapter
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
+import com.google.android.material.tabs.TabLayout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import android.app.FragmentManager
+import android.app.FragmentTransaction
+
 
 class MainActivity : AppCompatActivity() {
+
+    lateinit var userId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
+
+        // 넘겨준 intent로 현재 user의 id 받아오기
+        userId = getIntent().getStringExtra("id")
+        Log.d("MainActivity","get intent : "+userId)
+
+        val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager, userId)
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
-//        val fab: FloatingActionButton = findViewById(R.id.fab)
-//
-//        fab.setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own fgssaction", Snackbar.LENGTH_LONG)
-//                .setAction("Action", null).show()
-//        }
 
 
-        testData()
+        // 테스트 계정 올리기
+        //testData()
 
+        // id를 각 fragment에 전송
+        /*var bundle: Bundle = Bundle()
+        bundle.putString("id",userId)
+        if(bundle!=null) {
+            Log.d("MainActivity","send bundle (not null)")
+            var fragment: GalleryFragment = GalleryFragment()
+            fragment.setArguments(bundle)
+
+            var fragmentManager: FragmentManager = getFragmentManager()
+            var fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.replace(R.id.fragment_gallery, fragment)
+            fragmentTransaction.commit()
+        }*/
 
     }
-
 
 
     // db에 테스트 계정들 올리기
     fun testData(){
 
         var testPhotoStrings1: ArrayList<String> = ArrayList()
-        for(i in 1..3) {
+        for(i in 1..5) {
             var imageStr = "image0" + i
             var resID = getResources().getIdentifier(imageStr, "drawable", getPackageName())
             var resBitmap = BitmapFactory.decodeResource(getResources(), resID)
@@ -60,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         var testPhotoStrings2: ArrayList<String> = ArrayList()
-        for(i in 10..13) {
+        for(i in 10..15) {
             var imageStr = "image" + i
             var resID = getResources().getIdentifier(imageStr, "drawable", getPackageName())
             var resBitmap = BitmapFactory.decodeResource(getResources(), resID)

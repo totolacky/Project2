@@ -16,6 +16,8 @@ import kotlinx.android.synthetic.main.fragment_contact.*
  */
 class ContactFragment : Fragment() {
 
+    var userId = ""
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -39,8 +41,10 @@ class ContactFragment : Fragment() {
          * number.
          */
         @JvmStatic
-        fun newInstance(): ContactFragment {
-            return ContactFragment()
+        fun newInstance(id: String): ContactFragment {
+            var newCF = ContactFragment()
+            newCF.userId = id
+            return newCF
         }
     }
 
