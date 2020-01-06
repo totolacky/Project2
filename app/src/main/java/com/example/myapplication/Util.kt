@@ -107,4 +107,22 @@ object Util {
 
         return contactData
     }
+
+    // Returns ChatroomData created from json string
+    fun getChatroomDataFramJson(json: String): ChatroomData {
+        val jsonObject = JSONObject(json)
+        val chatroomData = ChatroomData()
+
+        Log.d("Util",json.toString())
+
+//        contactData._id = jsonObject.getString("_id")
+//        contactData.name = jsonObject.getString("name")
+//        contactData.country_code = jsonObject.getInt("country_code")
+//        contactData.profile_photo = jsonObject.getString("profile_photo")
+//        contactData.status = jsonObject.getString("status")
+//        if (contactData.status.equals("null"))
+//            contactData.status = ""
+
+        return chatroomData
+    }
 }

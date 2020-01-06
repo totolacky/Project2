@@ -37,7 +37,7 @@
         android:layout_toEndOf="@id/chatroom_image"/>
 
     <TextView
-        android:id="@+id/elem_name"
+        android:id="@+id/chatroom_name"
         android:layout_width="fill_parent"
         android:layout_height="20dip"
         android:layout_above="@id/chatroom_lastchat"

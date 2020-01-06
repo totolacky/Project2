@@ -28,7 +28,6 @@ interface MyService {
     // facebook id 보내면 이미 가입했는지 여부 보내줌
     fun checkRegistered(@Field("facebookId") facebookId: String): Call<String>
 
-
     @FormUrlEncoded
     @POST("/addFriendFb")
     // 나와 새 친구의 facebook id를 보내면 서로 친구추가
@@ -36,13 +35,28 @@ interface MyService {
 
     @FormUrlEncoded
     @POST("/getFriends")
-    // id를 보내면 그 사람의 친구 리스트 보내줌
+    // id를 보내면 그 사람의 친구 리스트를 보내줌
     fun getFriends(@Field("id") id: String): Call<ArrayList<String>>
 
     @FormUrlEncoded
     @POST("/getContactSimple")
-    // id를 보내면 그 사람의 단순화된 연락처 보내줌
+    // id를 보내면 그 사람의 단순화된 연락처를 보내줌
     fun getContactSimple(@Field("id") id: String): Call<String>
+
+    @FormUrlEncoded
+    @POST("/getChatrooms")
+    // 유저 id를 보내면 그 사람의 채팅방 리스트를 보내줌
+    fun getChatrooms(@Field("id") id: String): Call<ArrayList<String>>
+
+    @FormUrlEncoded
+    @POST("/getChatroom")
+    // 채팅방 id를 보내면 채팅방 정보를 보내줌
+    fun getChatroom(@Field("id") id: String): Call<String>
+
+    @FormUrlEncoded
+    @POST("/createChatroom")
+    // 유저 id를 보내면 그 사람의 채팅방 리스트를 보내줌
+    fun createChatroom(@Field("myId") myId: String, @Field("yourId") yourId: String): Call<String>
 
     @FormUrlEncoded
     @POST("/initGallery")

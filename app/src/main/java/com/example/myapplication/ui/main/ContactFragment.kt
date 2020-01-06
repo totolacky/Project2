@@ -23,7 +23,7 @@ import kotlin.concurrent.thread
  */
 class ContactFragment : Fragment() {
 
-    val id = "5e13631eb4733f33b0697eae"
+    var id = "5e13631eb4733f33b0697eae"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,7 +50,7 @@ class ContactFragment : Fragment() {
         @JvmStatic
         fun newInstance(id: String): ContactFragment {
             var newCF = ContactFragment()
-            newCF.userId = id
+            newCF.id = id
             return newCF
         }
     }
@@ -61,6 +61,24 @@ class ContactFragment : Fragment() {
         val mAdapter = ContactAdapter(requireContext(), addrList) { prof ->
             Toast.makeText(context,"clicked: "+prof.name,Toast.LENGTH_LONG).show()
             // view가 click되었을 때 실행할 것들
+
+            val your_id = prof._id
+            var chatroomId: String
+
+            thread(start = true){
+                var retrofit = Retrofit.Builder()
+                    .baseUrl(Config.serverUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+
+                var myService: MyService = retrofit.create(MyService::class.java)
+
+                chatroomId = myService.createChatroom(id,your_id).execute().body()!!
+
+            }.join()
+
+            // TODO: Open a ChatRoomActivity corresponding to chatroomId
+
         }
 
         mRecyclerView.adapter = mAdapter
