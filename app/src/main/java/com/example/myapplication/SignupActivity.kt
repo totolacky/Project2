@@ -166,7 +166,8 @@ class SignupActivity : AppCompatActivity() {
                 contactData.profile_photo,
                 contactData.photos,
                 contactData.friends,
-                contactData.hashtag
+                contactData.hashtag,
+                contactData.chatroom
             ).enqueue(object: Callback<String> {
                 override fun onFailure(call: Call<String>, t: Throwable){
                     Log.e("register",t.message)

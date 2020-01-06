@@ -45,8 +45,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
-
     // db에 테스트 계정들 올리기
     fun testData(){
 
@@ -88,7 +86,6 @@ class MainActivity : AppCompatActivity() {
         testUsers.add(ContactData("10","Kevin","hehehehehe",0,null,testPhotoStrings1,testFriendIds2,null))
         testUsers.add(ContactData("11","Jake",null,0,null,testPhotoStrings2,testFriendIds1,null))
         testUsers.add(ContactData("12","Jane","null?",0,null,testPhotoStrings1,testFriendIds2,null))
-
 
         var retrofit = Retrofit.Builder()
             .baseUrl(Config.serverUrl)

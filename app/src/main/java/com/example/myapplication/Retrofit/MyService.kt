@@ -17,7 +17,8 @@ interface MyService {
                  @Field("profile_photo") profile_photo: String?,
                  @Field("photos") photos: ArrayList<String>?,
                  @Field("friends") friends: ArrayList<String>?,
-                 @Field("hashtag") hashtag: ArrayList<String>?): Call<String>
+                 @Field("hashtag") hashtag: ArrayList<String>?,
+                 @Field("chatroom") chatroom: ArrayList<String>?): Call<String>
 
     @FormUrlEncoded
     @POST("/checkRegistered")
