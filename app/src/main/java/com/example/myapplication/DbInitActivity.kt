@@ -10,6 +10,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.concurrent.thread
 
 class DbInitActivity : AppCompatActivity() {
 
@@ -59,46 +60,55 @@ class DbInitActivity : AppCompatActivity() {
         testUsers.add(ContactData("","11","Jake","",2,"",testPhotoStrings2,ArrayList(),ArrayList(),ArrayList()))
         testUsers.add(ContactData("","12","Jane","",0,"",testPhotoStrings1,ArrayList(),ArrayList(),ArrayList()))
 
-        var retrofit = Retrofit.Builder()
-            .baseUrl(Config.serverUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        var myService: MyService = retrofit.create(MyService::class.java)
+        var tmpThread: Thread
 
         for(i in 0..12) {
-            var contactData = testUsers[i]
-            myService.register(
-                contactData.facebookId,
-                contactData.name,
-                contactData.status,
-                contactData.country_code,
-                contactData.profile_photo,
-                contactData.photos,
-                contactData.friends,
-                contactData.hashtag,
-                contactData.chatroom
-            ).enqueue(object : Callback<String> {
-                override fun onFailure(call: Call<String>, t: Throwable) {
-                    Log.e("test register", t.message)
-                }
+            tmpThread = thread(start = true){
+                var retrofit = Retrofit.Builder()
+                    .baseUrl(Config.serverUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
 
-                override fun onResponse(call: Call<String>, response: Response<String>) {
-                    Log.d("test id", response.body())
-                }
-            })
+                var myService: MyService = retrofit.create(MyService::class.java)
+
+                var contactData = testUsers[i]
+                myService.register(
+                    contactData.facebookId,
+                    contactData.name,
+                    contactData.status,
+                    contactData.country_code,
+                    contactData.profile_photo,
+                    contactData.photos,
+                    contactData.friends,
+                    contactData.hashtag,
+                    contactData.chatroom
+                ).execute()
+//                    enqueue(object : Callback<String> {
+//                    override fun onFailure(call: Call<String>, t: Throwable) {
+//                        Log.e("test register", t.message)
+//                    }
+//
+//                    override fun onResponse(call: Call<String>, response: Response<String>) {
+//                        Log.d("test id", response.body())
+//                    }
+//                })
+            }
+            tmpThread.join()
         }
 
         for (i in 0..12) {
             for (j in 0..12) {
-                myService.addFriendFb(""+i,""+j).enqueue(object: Callback<String> {
-                    override fun onFailure(call: Call<String>, t: Throwable) {
-                        Log.e("test register", t.message)
-                    }
-                    override fun onResponse(call: Call<String>, response: Response<String>) {
-                        Log.d("test id", response.body())
-                    }
-                })
+                tmpThread = thread(start = true){
+                    var retrofit = Retrofit.Builder()
+                        .baseUrl(Config.serverUrl)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
+
+                    var myService: MyService = retrofit.create(MyService::class.java)
+
+                    myService.addFriendFb(""+i,""+j).execute()
+                }
+                tmpThread.join()
             }
         }
     }
