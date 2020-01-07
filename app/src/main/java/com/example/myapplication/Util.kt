@@ -6,6 +6,7 @@ import android.util.Base64
 import android.util.Log
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import java.util.*
 
 
 object Util {
@@ -106,5 +107,21 @@ object Util {
             contactData.status = ""
 
         return contactData
+    }
+
+
+    fun <T> ArrayList<T>.shuffle(): ArrayList<T> {
+        val rng = Random()
+
+        for (index in 0..this.size - 1) {
+            val randomIndex = rng.nextInt(index)
+
+            // Swap with the random position
+            val temp = this[index]
+            this[index] = this[randomIndex]
+            this[randomIndex] = temp
+        }
+
+        return this
     }
 }

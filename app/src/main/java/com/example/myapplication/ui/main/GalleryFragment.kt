@@ -11,6 +11,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.*
 import com.example.myapplication.*
@@ -70,6 +73,14 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
         }
     }
 
+    var isFabOpen: Boolean = false
+    lateinit var fab_open: Animation
+    lateinit var fab_close: Animation
+    lateinit var main_fab: FloatingActionButton
+    lateinit var uploadButton: FloatingActionButton
+    lateinit var refreshButton: FloatingActionButton
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -86,29 +97,69 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
         GalleryRecyclerView = rootView.findViewById(R.id.recyclerView)as RecyclerView
         GalleryRecyclerView.adapter = GalleryRecyclerAdapter(requireContext(), this, myGalleryList)
 
-        // 업로드 버튼 - 클릭 시 사진 추가 가능
-        var uploadButton: FloatingActionButton = rootView.findViewById(R.id.uploadbutton)
-        uploadButton.setOnClickListener {
-            Toast.makeText(getContext(), "select the image for introducing yourself", Toast.LENGTH_SHORT).show()
-            loadImage()
+
+        // floating action button
+        fab_open = AnimationUtils.loadAnimation(getContext(), R.anim.fab_open)
+        fab_close = AnimationUtils.loadAnimation(getContext(), R.anim.fab_close)
+
+        main_fab = rootView.findViewById(R.id.mainfab)
+        uploadButton = rootView.findViewById(R.id.uploadbutton)
+        refreshButton = rootView.findViewById(R.id.refreshbutton)
+
+        // 메인 버튼 - 애니메이션
+        main_fab.setOnClickListener{
+            toggleFab()
         }
 
+        // 업로드 버튼 - 클릭 시 사진 추가 가능
+        uploadButton.setOnClickListener {
+            toggleFab()
+            Toast.makeText(getContext(), "select the image for introducing yourself", Toast.LENGTH_SHORT).show()
+            uploadImage()
+        }
+
+        // 리프레시 버튼 - 클릭 시 새 갤러리 불러오기
+        refreshButton.setOnClickListener{
+            toggleFab()
+            Toast.makeText(getContext(), "reload gallery", Toast.LENGTH_SHORT).show()
+            loadNewGallery()
+        }
 
         return rootView
     }
 
-    /*
+    fun toggleFab(){
+        if(isFabOpen){
+            main_fab.setImageResource(R.drawable.ic_add);
+            uploadButton.startAnimation(fab_close);
+            refreshButton.startAnimation(fab_close);
+            uploadButton.setClickable(false);
+            refreshButton.setClickable(false);
+            isFabOpen = false;
+        }
+        else{
+            main_fab.setImageResource(R.drawable.ic_close);
+            uploadButton.startAnimation(fab_open);
+            refreshButton.startAnimation(fab_open);
+            uploadButton.setClickable(true);
+            refreshButton.setClickable(true);
+            isFabOpen = true;
+        }
+
+    }
+
+
     // recycler view 가 업데이트가 안 되면 걍 이걸로 싹 밀어버려
-    fun refresh(){
+    fun refreshView(){
         activity?.also{
             var viewAdapter = GalleryRecyclerAdapter(requireContext(), this, myGalleryList)
             GalleryRecyclerView = it.findViewById<RecyclerView>(R.id.recyclerView).apply {
                 setHasFixedSize(true)
                 adapter = viewAdapter
             }
-            activity?.findViewById<LinearLayout>(R.id.fragment_gallery)?.invalidate()
+            activity?.findViewById<RelativeLayout>(R.id.fragment_gallery)?.invalidate()
         }
-    }*/
+    }
 
     // recycler view 안에 있는 사진 선택 시 액티비티 시작 (사진, 사진 user, user와의 chat)
     override fun onItemSelected(view: View, position: Int){
@@ -119,73 +170,143 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
     }
 
 
-    var initNum: Int = 14
+    var initNum: Int = 0
 
     // 내 갤러리에는 남들의 사진들이 뜸
     fun init(){
         myGalleryList.clear()
-        // 서버한테 요청
 
-        var cnt = 0
-        var idx = 0
-        while(cnt<initNum) {
-            /*myService.getGallery(myId)
-                .enqueue(object : Callback<GalleryData> {
-                    override fun onFailure(
-                        call: Call<GalleryData>, t: Throwable
-                    ) {
-                        Log.e("gallery", t.message)
-                        Toast.makeText(getContext(), "get gallery fail", Toast.LENGTH_SHORT).show()
-                    }
+        // 서버 요청 1 : 총 유저 수
+        var tmpThread1 = thread(start = true) {
+            var retrofit = Retrofit.Builder()
+                .baseUrl(serverUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
 
-                    override fun onResponse(
-                        call: Call<GalleryData>, response: Response<GalleryData>
-                    ) {
-                        Log.d("gallery", "init response ok")
-                        if(response.body()==null) Log.d("gallery","response body is null")
-                        Log.d("gallery",response.body()?.selectedPhoto)
-                        myGalleryList.add(GalleryItem(Util.getBitmapFromString(response.body()!!.selectedPhoto), response.body()!!.userContactData))
-                    }
-                })*/
+            var myService: MyService = retrofit.create(MyService::class.java)
 
-            var tmpThread = thread(start = true){
-                var retrofit = Retrofit.Builder()
-                    .baseUrl(serverUrl)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build()
+            var response = myService.getUserNumber(myId).execute()
+            if (response.body() == null) Log.d("init getUserNumber", "response body is null")
+            else {
+                initNum = response.body()!! - 1
+                Log.d("initNum", initNum.toString())
 
-                var myService: MyService = retrofit.create(MyService::class.java)
+                // 서버 요청 2 (initNum 번 반복) : 사진, 정보 갖고오기
+                var cnt = 0
+                var idx = 0
+                while (cnt < initNum) {
 
-                var response = myService.getGallery(myId, idx).execute()
-                idx++
-                if(response.body()==null) Log.d("gallery","response body is null")
-                else{
-                    if(response.body()!!.selectedPhoto=="") Log.d("gallery","response body selected photo is null")
-                    else {
-                        myGalleryList.add(
-                            GalleryItem(
-                                Util.getBitmapFromString(response.body()!!.selectedPhoto),
-                                response.body()!!.userContactData
+                    var tmpThread2 = thread(start = true) {
+                        var retrofit = Retrofit.Builder()
+                            .baseUrl(serverUrl)
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build()
+
+                        var myService: MyService = retrofit.create(MyService::class.java)
+
+                        var response = myService.getGallery(myId, idx).execute()
+                        idx++
+                        if (response.body() == null) Log.d("gallery", "response body is null")
+                        else {
+                            if (response.body()!!.selectedPhoto == "") Log.d(
+                                "gallery",
+                                "response body selected photo is null"
                             )
-                        )
-                        cnt++
+                            else {
+                                myGalleryList.add(
+                                    GalleryItem(
+                                        Util.getBitmapFromString(response.body()!!.selectedPhoto),
+                                        response.body()!!.userContactData
+                                    )
+                                )
+                                cnt++
+                            }
+                        }
+
                     }
+
+                    tmpThread2.join()
+                }
+                myGalleryHolder.setDataList(myGalleryList)
+                Log.d("init gallery", "other users' photos and ContactDatas")
+            }
+        }
+        tmpThread1.join()
+    }
+
+
+    // 새로고침하면 갤러리 다시 가져오기
+    fun loadNewGallery(){
+        // 서버 요청 1 : 총 유저 수
+        var tmpThread1 = thread(start = true) {
+            var retrofit = Retrofit.Builder()
+                .baseUrl(serverUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            var myService: MyService = retrofit.create(MyService::class.java)
+
+            var response = myService.getUserNumber(myId).execute()
+            if (response.body() == null) Log.d("new getUserNumber", "response body is null")
+            else {
+                // 사람이 늘었으면 내 갤러리에 그만큼 추가
+                if (initNum < response.body()!! - 1){
+                    // 서버 요청 2 : 사진, 정보 갖고오기
+                    var cnt = initNum
+                    var idx = initNum
+                    initNum = response.body()!! - 1
+                    while (cnt < initNum) {
+
+                        var tmpThread2 = thread(start = true) {
+                            var retrofit = Retrofit.Builder()
+                                .baseUrl(serverUrl)
+                                .addConverterFactory(GsonConverterFactory.create())
+                                .build()
+
+                            var myService: MyService = retrofit.create(MyService::class.java)
+
+                            var response = myService.getGallery(myId, idx).execute()
+                            idx++
+                            if (response.body() == null) Log.d("new gallery", "response body is null")
+                            else {
+                                if (response.body()!!.selectedPhoto == "") Log.d(
+                                    "new gallery","response body selected photo is null"
+                                )
+                                else {
+                                    myGalleryList.add(
+                                        GalleryItem(
+                                            Util.getBitmapFromString(response.body()!!.selectedPhoto),
+                                            response.body()!!.userContactData
+                                        )
+                                    )
+                                    cnt++
+                                }
+                            }
+
+                        }
+
+                        tmpThread2.join()
+                    }
+                    Log.d("new gallery", "new users' photos and ContactDatas added")
                 }
 
             }
-
-            tmpThread.join()
         }
-        myGalleryHolder.setDataList(myGalleryList)
-        Log.d("init gallery","other users' photos and ContactDatas")
-    }
+        tmpThread1.join()
 
+        // 셔플
+        myGalleryList.shuffle()
+        myGalleryHolder.setDataList(myGalleryList)
+
+        // 리사이클러뷰 다시 설정
+        refreshView()
+    }
 
 
     // 갤러리에서 사진 선택시 내 DB에 photos에 추가됨 (다른 사람들의 갤러리 탭에 뜸)
     val Gallery = 0
 
-    fun loadImage(){
+    fun uploadImage(){
         var intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
@@ -206,22 +327,6 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                     var bitmap: Bitmap = MediaStore.Images.Media.getBitmap(getActivity()!!.getContentResolver(), dataUri)
                     var bitmapStr: String? = Util.getStringFromBitmap(bitmap)
 
-                    /*myService.uploadPhoto(myId, bitmapStr!!).enqueue(object : Callback<String> {
-                        override fun onFailure(
-                            call: Call<String>, t: Throwable
-                        ) {
-                            Log.e("upload", t.message)
-                            Toast.makeText(getContext(), "upload fail", Toast.LENGTH_SHORT).show()
-                        }
-
-                        override fun onResponse(
-                            call: Call<String>, response: Response<String>
-                        ) {
-
-                        }
-                    })
-                    // 내 contact data에 올렸으니까 이거 db로 다시 올려야하는데 어떻게 보내지??*/
-
                     var tmpThread = thread(start = true){
                         var retrofit = Retrofit.Builder()
                             .baseUrl(Config.serverUrl)
@@ -232,10 +337,10 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
 
                         var response = myService.uploadPhoto(myId, bitmapStr!!).execute()
                         Log.d("upload", response.body())
-                        Toast.makeText(getContext(), "upload success", Toast.LENGTH_SHORT).show()
 
                     }
 
+                    Toast.makeText(getContext(), "upload success", Toast.LENGTH_SHORT).show()
                     tmpThread.join()
 
                 }catch (e:Exception){

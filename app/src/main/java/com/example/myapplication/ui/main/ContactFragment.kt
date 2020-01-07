@@ -25,6 +25,9 @@ class ContactFragment : Fragment() {
 
     var id = "5e136121b4733f33b0697ea3"
 
+    var isfirst = true
+    var addrList: ArrayList<ContactData?>? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -56,7 +59,11 @@ class ContactFragment : Fragment() {
     }
 
     fun refreshContact(){
-        val addrList = getContactList()
+        if (isfirst) {
+            addrList = getContactList()
+            isfirst = false
+        }
+
         // onClick 설정
         val mAdapter = ContactAdapter(requireContext(), addrList) { prof ->
             Toast.makeText(context,"clicked: "+prof.name,Toast.LENGTH_LONG).show()
