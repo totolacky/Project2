@@ -38,14 +38,16 @@ class GalleryHolder{
     }
 
     fun getDataById(position: Int) : GalleryItem {
-        return gallery_holder[position]
+        return gallery_holder.get(position) //[position]
     }
 }
 
-var myGalleryHolder = GalleryHolder()
-var myGalleryList: ArrayList<GalleryItem> = ArrayList()
+object Global {
+    var myGalleryHolder = GalleryHolder()
+    var myGalleryList: ArrayList<GalleryItem> = ArrayList()
 
-var getNew: Boolean = true
+    var getNew: Boolean = true
+}
 
 class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInterface {
 
@@ -86,16 +88,16 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
         savedInstanceState: Bundle?
     ): View? {
 
-        if(getNew){
+        if(Global.getNew){
             init()
-            getNew = false
+            Global.getNew = false
         }
 
         rootView = inflater.inflate(R.layout.fragment_gallery, container, false)
 
         // 이미지는 recycler view로 구현
         GalleryRecyclerView = rootView.findViewById(R.id.recyclerView)as RecyclerView
-        GalleryRecyclerView.adapter = GalleryRecyclerAdapter(requireContext(), this, myGalleryList)
+        GalleryRecyclerView.adapter = GalleryRecyclerAdapter(requireContext(), this, Global.myGalleryList)
 
 
         // floating action button
@@ -152,7 +154,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
     // recycler view 가 업데이트가 안 되면 걍 이걸로 싹 밀어버려
     fun refreshView(){
         activity?.also{
-            var viewAdapter = GalleryRecyclerAdapter(requireContext(), this, myGalleryList)
+            var viewAdapter = GalleryRecyclerAdapter(requireContext(), this, Global.myGalleryList)
             GalleryRecyclerView = it.findViewById<RecyclerView>(R.id.recyclerView).apply {
                 setHasFixedSize(true)
                 adapter = viewAdapter
@@ -175,7 +177,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
 
     // 내 갤러리에는 남들의 사진들이 뜸
     fun init(){
-        myGalleryList.clear()
+        Global.myGalleryList.clear()
 
         // 서버 요청 1 : 총 유저 수
         var tmpThread1 = thread(start = true) {
@@ -214,7 +216,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                                 "response body selected photo is null"
                             )
                             else {
-                                myGalleryList.add(
+                                Global.myGalleryList.add(
                                     GalleryItem(
                                         Util.getBitmapFromString(response.body()!!.selectedPhoto),
                                         response.body()!!.userContactData
@@ -228,7 +230,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
 
                     tmpThread2.join()
                 }
-                myGalleryHolder.setDataList(myGalleryList)
+                Global.myGalleryHolder.setDataList(Global.myGalleryList)
                 Log.d("init gallery", "other users' photos and ContactDatas")
             }
         }
@@ -274,7 +276,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                                     "new gallery","response body selected photo is null"
                                 )
                                 else {
-                                    myGalleryList.add(
+                                    Global.myGalleryList.add(
                                         GalleryItem(
                                             Util.getBitmapFromString(response.body()!!.selectedPhoto),
                                             response.body()!!.userContactData
@@ -296,8 +298,8 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
         tmpThread1.join()
 
         // 셔플
-        myGalleryList.shuffle()
-        myGalleryHolder.setDataList(myGalleryList)
+        Global.myGalleryList.shuffle()
+        Global.myGalleryHolder.setDataList(Global.myGalleryList)
 
         // 리사이클러뷰 다시 설정
         refreshView()
