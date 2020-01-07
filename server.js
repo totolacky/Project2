@@ -435,7 +435,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             db.collection('user').find({'_id':mongoose.mongo.ObjectID(_id)}).count(function(err,number){
                 if(number!=0){
                     // User is registered
-                    db.collection('user').findOne({},function(error,res){
+                    db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(_id)},function(error,res){
                         //console.log(res)
                         response.json(res.friends.length)
                         console.log('Friend number sent.');
@@ -458,7 +458,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             db.collection('user').find({'_id':mongoose.mongo.ObjectID(_id)}).count(function(err,number){
                 if(number!=0){
                     // User is registered
-                    db.collection('user').findOne({},function(error,res){
+                    db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(_id)},function(error,res){
                         //console.log(res.chatroom)
                         response.json(res.chatroom)
                         console.log('Friends sent.');
