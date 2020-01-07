@@ -19,7 +19,7 @@
         android:visibility="invisible"
         app:borderWidth="0dp"
         app:fabSize="normal"
-        app:srcCompat="@android:drawable/ic_menu_upload"
+        android:background="@drawable/ic_file_upload"
         app:backgroundTint="@color/colorPrimary"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -33,7 +33,7 @@
         android:visibility="invisible"
         app:borderWidth="0dp"
         app:fabSize="normal"
-        app:srcCompat="@android:drawable/ic_menu_rotate"
+        android:background="@drawable/ic_refresh"
         app:backgroundTint="@color/colorPrimary"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
