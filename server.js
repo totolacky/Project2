@@ -21,9 +21,15 @@ var MongoClient = mongodb.MongoClient;
 // Connection URL
 var url = 'mongodb://localhost:27017'
 
+// Connected Sockets
+var clients = []
+
 MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
     if(err) console.log('Unable to connection to the mongoDB server.Error', err);
     else{
+
+        // HTTP requests
+
         app.post('/login', (request,response,next)=>{
             var post_data = request.body;
 
@@ -236,7 +242,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                 if(number!=0){
                     // User is registered
                     db.collection('user').findOne({},function(error,res){
-                        console.log(res)
+                        //console.log(res)
                         response.json(res.friends)
                         console.log('Friends sent.');
                     })
@@ -250,7 +256,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
         });
 
         app.post('/getContactSimple', (request,response,next)=>{
-            console.log('aaaaaaaaaaa')
+            //console.log('aaaaaaaaaaa')
 
             var _id = request.body.id;
             console.log("getContactSimple called with id: "+_id)
@@ -267,7 +273,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                         else {
                             //console.log(res.friends)
 
-                            console.log(res)
+                            //console.log(res)
                             var resultJson = {
                                 '_id': res._id,
                                 'name': res.name,
@@ -277,7 +283,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                             };
 
                             response.json(JSON.stringify(resultJson))
-                            console.log(JSON.stringify(resultJson))
+                            //console.log(JSON.stringify(resultJson))
                             console.log('Friends sent.');
                         }
                     })
@@ -300,7 +306,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                 if(number!=0){
                     // User is registered
                     db.collection('user').findOne({},function(error,res){
-                        console.log(res.chatroom)
+                        //console.log(res.chatroom)
                         response.json(res.chatroom)
                         console.log('Friends sent.');
                     })
@@ -325,12 +331,12 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                 if(number!=0){
                     // Chatroom exists
                     console.log('Chatroom exists.');
-                    db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(chatroom_id)},function(error,res){
+                    db.collection('chatroom').findOne({'_id':mongoose.mongo.ObjectID(chatroom_id)},function(error,res){
                         if(error) console.log(error)
                         else {
                             //console.log(res.friends)
 
-                            console.log(res)
+                            //console.log(res)
                             var resultJson = {
                                 'chatroom_id': res.chatroom_id,
                                 'chatroom_name': res.chatroom_name,
@@ -341,7 +347,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                             };
 
                             response.json(JSON.stringify(resultJson))
-                            console.log(JSON.stringify(resultJson))
+                            //console.log(JSON.stringify(resultJson))
                             console.log('Chatroom sent.');
                         }
                     })
@@ -493,6 +499,38 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             // })
         });
 
+        app.post('/getChatLog', (request,response,next)=>{
+
+            var chatroom_id = request.body.id;
+            console.log("getChatroom called with id: "+chatroom_id)
+
+            var db = client.db('penstagram');
+
+            // check exists id
+            db.collection('chatroom').findOne({'_id':mongoose.mongo.ObjectID(chatroom_id)}, function(err,res){
+                if(err) {
+                    console.log("error: no such chatroom exists")
+                    response.json('chatroom does not exist')
+                }
+                else {
+                    // Chatroom exists
+                    console.log('Chatroom exists.');
+                    console.log(res.chat.length)
+
+                    // Stringify
+                    var result = []
+                    for (i=0; i<res.chat.length; i++) {
+                        //console.log(JSON.stringify(res.chat[i]))
+                        result.push(JSON.stringify(res.chat[i]))
+                    }
+
+                    //console.log(result)
+                    response.json(result)
+                    console.log('Chat log sent.')
+                }
+            })
+        });
+
         // Start Web Server
         var server = app.listen(80, ()=>{
             console.log('Connected to MongoDB Server , WebService running on port 80');
@@ -500,24 +538,91 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
 
         // Set Socket Server
         var io = socketio.listen(server);
+
         io.sockets.on('connection', function (socket){
             console.log('Socket ID : ' + socket.id + ', Connect');
-            socket.on('clientMessage', function(data){
-                console.log('Client Message : ' + data);
 
-                var message = {
-                    msg : 'server',
-                    data : 'data'
-                };
-                socket.emit('serverMessage', message);
+            var myId;
+            var chatroomId;
+            var sendList;
+
+            // Link socket event handlers
+            socket.on('clientConnect',function(data){
+                var thisClient = new Object()
+                thisClient.myId = data.myId
+                thisClient.chatroomId = data.chatroomId
+                thisClient.people = data.people
+                thisClient.socketId = socket.id
+                clients.push(thisClient)
+
+                myId = data.myId
+                chatroomId = data.chatroomId
+                sendList = data.people
+
+                //console.log("client connected with sendList: "+sendList)
+            })
+
+            socket.on('clientMessage', function(data){
+                console.log('Client Message : ' + JSON.stringify(data));
+
+                var sendData = {
+                    'id': myId,
+                    'script': data.script,
+                    'date_time': data.date_time
+                }
+
+                // Send message to other clients
+
+                //console.log(sendList)
+                console.log(clients)
+
+                for (j=0; j<sendList.length; j++) {
+                    sendId = sendList[j]
+                    console.log('sendId: '+sendId)
+                    if (sendId === myId) {
+                        console.log('No need to send to yourself.')
+                        continue
+                    }
+
+                    var obj = null
+
+                    for (i=0; i<clients.length; i++) {
+                        if (clients[i].myId === sendId) {
+                            obj = clients[i]
+                            break
+                        }
+                    }
+
+                    if (obj == null) {
+                        console.log('the socket you are looking for is not in the client list')
+                        continue
+                    }
+                    var sendId = obj.socketId
+
+                    io.to(sendId).emit('serverMessage',sendData)
+                    console.log('New chat sent to another user.')
+                }
+
+                var db = client.db('penstagram');
+
+                // Save message in DB
+                db.collection('chatroom').findOne({'_id': mongoose.mongo.ObjectID(chatroomId)},function(err,res){
+                    if (err) console.log("Error: chatroom does not exist")
+                    else {
+                        var chat = res.chat
+                        chat.push(sendData)
+                        db.collection('chatroom').updateOne({'_id': mongoose.mongo.ObjectID(chatroomId)},{$set: {'chat':chat}},function(err,res){
+                            if(err) throw err
+                            console.log('New chat updated')
+                        });
+                    }
+                })
             });
         });
     }
 })
 
-
-
-
-
-
-
+// Additional functions
+var matchId = function (element,id) {
+    return obj.myId === id
+}
