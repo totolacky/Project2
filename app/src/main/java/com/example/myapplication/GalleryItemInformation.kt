@@ -29,7 +29,6 @@ class GalleryItemInformation : AppCompatActivity() {
         thisItem = myGalleryHolder.getDataById(pos)
 
         var myId = intent.getStringExtra("MYID")
-        Log.d("gallry item info",myId)
 
         var userId = thisItem.userInfo!!._id
 
