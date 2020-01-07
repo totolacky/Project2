@@ -11,7 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.Retrofit.MyService
-import com.example.myapplication.ui.main.myGalleryHolder
+import com.example.myapplication.ui.main.Global
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.concurrent.thread
@@ -26,7 +26,9 @@ class GalleryItemInformation : AppCompatActivity() {
         setContentView(R.layout.activity_gallery)
 
         var pos = intent.getIntExtra("POS", 0)
-        thisItem = myGalleryHolder.getDataById(pos)
+        thisItem = Global.myGalleryHolder.getDataById(pos)
+
+        Log.d("thisItem",""+thisItem.userInfo)
 
         var myId = intent.getStringExtra("MYID")
         Log.d("gallry item info",myId)
@@ -72,6 +74,8 @@ class GalleryItemInformation : AppCompatActivity() {
                     .build()
 
                 var myService: MyService = retrofit.create(MyService::class.java)
+
+                Log.d("GalleryItemInformation","myId = "+myId+" userId = "+userId)
 
                 var response = myService.createChatroom(myId, userId).execute()
                 if(response.body()==null) Log.d("messageButton","response body null")
