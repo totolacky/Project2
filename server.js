@@ -62,7 +62,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             })
         });
 
-        app.post('/initGallery', (request,response,next)=>{
+        app.post('/getGalleryItem', (request,response,next)=>{
             var post_data = request.body;
 
             var id = post_data.id;
@@ -70,47 +70,38 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
 
             var db = client.db('penstagram');
 
-            // user 랜덤 선택 (id ㄴㄴ) -> photo 랜덤 선택
-            //var query = {'_id':{$ne:id}};
-            //var totalCnt = db.collection('user').find().count(function(err,number){
+            // 나 아닌 유저들을 배열로 만든다
+            var query = {'_id':{$ne:mongoose.mongo.ObjectID(id)}};
+            db.collection('user').find(query).toArray(function(err,selectedUser){
+                var userContactData = {
+                    '_id': selectedUser[idx]._id.toString(),
+                    'facebookId': selectedUser[idx].facebookId,
+                    'name': selectedUser[idx].name,
+                    'status': selectedUser[idx].status,
+                    'country_code': selectedUser[idx].country_code,
+                    'profile_photo':selectedUser[idx].profile_photo,
+                    'photos': selectedUser[idx].photos,
+                    'friends': selectedUser[idx].friends,
+                    'hashtag': selectedUser[idx].hashtag,
+                };
+                console.log(userContactData._id)
+                console.log(id)
+                console.log(userContactData.name)
 
-                //var skipSize = Math.floor(Math.random()*number);
-                var selectedUser = db.collection('user').find({'_id':{$ne:id}}).toArray(function(err,selectedUser){
+                var photoArray = selectedUser[idx].photos;
 
-                    var userContactData = {
-                        '_id': selectedUser[idx]._id,
-                        'facebookId': selectedUser[idx].facebookId,
-                        'name': selectedUser[idx].name,
-                        'status': selectedUser[idx].status,
-                        'country_code': selectedUser[idx].country_code,
-                        'profile_photo':selectedUser[idx].profile_photo,
-                        'photos': selectedUser[idx].photos,
-                        'friends': selectedUser[idx].friends,
-                        'hashtag': selectedUser[idx].hashtag,
-                    };
+                var selectedPhoto = null;
+                if(photoArray.length>0){
+                    var randNum = Math.floor(Math.random()*photoArray.length);
+                    selectedPhoto = photoArray[randNum];
+                    console.log('select photo success')
+                }
+                else{
+                    console.log('photoArray is empty')
+                }
 
-                    console.log(userContactData.name)
-
-                    var selectedPhoto=""
-
-                    var photoArray = selectedUser[idx].photos;
-                    if(photoArray != null){
-                        //var randNum = Math.floor(Math.random()*photoArray.length);
-                        selectedPhoto = photoArray[0]
-                        response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
-                        console.log('Send data to init gallery success');
-                    }
-                    else{
-                        console.log('photoArray null');
-                        response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
-                        console.log('Send data fail (selectedPhoto is null)');
-                    }
-
-                });
-
-
-            //});
-
+                response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
+            });
         });
 
         app.post('/register', (request,response,next)=>{
@@ -167,8 +158,8 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             // check exists email
             db.collection('user').find({'facebookId':post_data.facebookId}).count(function(err,number){
                 if(number!=0){
-                    response.json('You already have the account');
-                    console.log('You already have the account');
+                    response.json('You already have an account');
+                    console.log('You already have an account');
                 }
                 else{
                     // insert data
@@ -215,7 +206,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             db.collection('user').find({'facebookId':facebookId}).count(function(err,number){
                 if(number!=0){
                     // User is registered
-                    db.collection('user').findOne({},function(error,res){
+                    db.collection('user').findOne({'facebookId':facebookId},function(error,res){
                         console.log(res._id)
                         response.json(res._id)
                         console.log('You have an account. Your id is '+res._id);
@@ -371,7 +362,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             db.collection('user').find({'_id':mongoose.mongo.ObjectID(_id)}).count(function(err,number){
                 if(number!=0){
                     // User is registered
-                    db.collection('user').findOne({},function(error,res){
+                    db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(_id)},function(error,res){
                         //console.log(res)
                         response.json(res.friends)
                         console.log('Friends sent.');
@@ -426,6 +417,29 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             })
         });
 
+        app.post('/getContactNum', (request,response,next)=>{
+            var _id = request.body.id;
+
+            var db = client.db('penstagram');
+
+            // check exists email
+            db.collection('user').find({'_id':mongoose.mongo.ObjectID(_id)}).count(function(err,number){
+                if(number!=0){
+                    // User is registered
+                    db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(_id)},function(error,res){
+                        //console.log(res)
+                        response.json(res.friends.length)
+                        console.log('Friend number sent.');
+                    })
+                }
+                else{
+                    // User is not registered
+                    response.json('not registered');
+                    console.log('You do not have an account('+_id+': false)');
+                }
+            })
+        });
+
         app.post('/getChatrooms', (request,response,next)=>{
             var _id = request.body.id;
 
@@ -435,10 +449,33 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             db.collection('user').find({'_id':mongoose.mongo.ObjectID(_id)}).count(function(err,number){
                 if(number!=0){
                     // User is registered
-                    db.collection('user').findOne({},function(error,res){
+                    db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(_id)},function(error,res){
                         //console.log(res.chatroom)
                         response.json(res.chatroom)
-                        console.log('Friends sent.');
+                        console.log('Chatrooms sent.');
+                    })
+                }
+                else{
+                    // User is not registered
+                    response.json('not registered');
+                    console.log('You do not have an account('+_id+': false)');
+                }
+            })
+        });
+
+        app.post('/getChatroomNum', (request,response,next)=>{
+            var _id = request.body.id;
+
+            var db = client.db('penstagram');
+
+            // check exists email
+            db.collection('user').find({'_id':mongoose.mongo.ObjectID(_id)}).count(function(err,number){
+                if(number!=0){
+                    // User is registered
+                    db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(_id)},function(error,res){
+                        //console.log(res.chatroom)
+                        response.json(res.chatroom.length)
+                        console.log('Chatroom number sent.');
                     })
                 }
                 else{
