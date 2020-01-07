@@ -166,6 +166,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
         Toast.makeText(getContext(), "Clicked Image ${position+1}", Toast.LENGTH_SHORT).show()
         val intent = Intent(activity, GalleryItemInformation::class.java)
         intent.putExtra("POS", position)
+        intent.putExtra("MYID", myId)
         startActivity(intent)
     }
 
