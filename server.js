@@ -70,47 +70,38 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
 
             var db = client.db('penstagram');
 
-            // user 랜덤 선택 (id ㄴㄴ) -> photo 랜덤 선택
-            //var query = {'_id':{$ne:id}};
-            //var totalCnt = db.collection('user').find().count(function(err,number){
+            // 나 아닌 유저들을 배열로 만든다
+            var query = {'_id':{$ne:mongoose.mongo.ObjectID(id)}};
+            db.collection('user').find(query).toArray(function(err,selectedUser){
+                var userContactData = {
+                    '_id': selectedUser[idx]._id.toString(),
+                    'facebookId': selectedUser[idx].facebookId,
+                    'name': selectedUser[idx].name,
+                    'status': selectedUser[idx].status,
+                    'country_code': selectedUser[idx].country_code,
+                    'profile_photo':selectedUser[idx].profile_photo,
+                    'photos': selectedUser[idx].photos,
+                    'friends': selectedUser[idx].friends,
+                    'hashtag': selectedUser[idx].hashtag,
+                };
+                console.log(userContactData._id)
+                console.log(id)
+                console.log(userContactData.name)
 
-                //var skipSize = Math.floor(Math.random()*number);
-                var selectedUser = db.collection('user').find({'_id':{$ne:id}}).toArray(function(err,selectedUser){
+                var photoArray = selectedUser[idx].photos;
 
-                    var userContactData = {
-                        '_id': selectedUser[idx]._id,
-                        'facebookId': selectedUser[idx].facebookId,
-                        'name': selectedUser[idx].name,
-                        'status': selectedUser[idx].status,
-                        'country_code': selectedUser[idx].country_code,
-                        'profile_photo':selectedUser[idx].profile_photo,
-                        'photos': selectedUser[idx].photos,
-                        'friends': selectedUser[idx].friends,
-                        'hashtag': selectedUser[idx].hashtag,
-                    };
+                var selectedPhoto = null;
+                if(photoArray.length>0){
+                    var randNum = Math.floor(Math.random()*photoArray.length);
+                    selectedPhoto = photoArray[randNum];
+                    console.log('select photo success')
+                }
+                else{
+                    console.log('photoArray is empty')
+                }
 
-                    console.log(userContactData.name)
-
-                    var selectedPhoto=""
-
-                    var photoArray = selectedUser[idx].photos;
-                    if(photoArray != null){
-                        //var randNum = Math.floor(Math.random()*photoArray.length);
-                        selectedPhoto = photoArray[0]
-                        response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
-                        console.log('Send data to init gallery success');
-                    }
-                    else{
-                        console.log('photoArray null');
-                        response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
-                        console.log('Send data fail (selectedPhoto is null)');
-                    }
-
-                });
-
-
-            //});
-
+                response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
+            });
         });
 
         app.post('/register', (request,response,next)=>{
