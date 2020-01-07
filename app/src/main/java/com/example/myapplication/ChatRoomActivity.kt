@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.Retrofit.MyService
@@ -22,6 +23,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.concurrent.thread
+
 
 class ChatRoomActivity: AppCompatActivity() {
 
@@ -53,12 +55,15 @@ class ChatRoomActivity: AppCompatActivity() {
         chat_recyclerview.adapter = cAdapter
         //레이아웃 매니저 선언
         val lm = LinearLayoutManager(this)
+        lm.stackFromEnd = true
         chat_recyclerview.layoutManager = lm
         chat_recyclerview.setHasFixedSize(true)//아이템이 추가삭제될때 크기측면에서 오류 안나게 해줌
+        chat_recyclerview.scrollToPosition(cAdapter.itemCount-1)
 
         chat_send_button.setOnClickListener {
             sendMessage()
         }
+
     }
 
     override fun onStart() {
@@ -155,6 +160,7 @@ class ChatRoomActivity: AppCompatActivity() {
         val item = ChatData(myId,chat_edit_text.text.toString(),getTime)
         cAdapter.addItem(item)
         cAdapter.notifyDataSetChanged()
+        chat_recyclerview.scrollToPosition(cAdapter.itemCount-1)
         //chat_recyclerview.scrollToPosition(RecyclerView.SCROLL_INDICATOR_END)
 
         //채팅 입력창 초기화
@@ -200,6 +206,7 @@ class ChatRoomActivity: AppCompatActivity() {
 
                 cAdapter.addItem(chatData)
                 cAdapter.notifyDataSetChanged()
+                chat_recyclerview.scrollToPosition(cAdapter.itemCount-1)
 
                 Log.d("ChatRoomActivity", "message recieved - " + receivedData.toString())
             } catch (e: JSONException) {

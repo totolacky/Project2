@@ -78,7 +78,6 @@ class ChatAdapter(val context: Context, val arrayList: ArrayList<ChatData>, val 
         val chat_You_Name: TextView = itemView.findViewById(R.id.chat_You_Name)
         val chat_Text: TextView = itemView.findViewById(R.id.chat_Text)
         val chat_Time: TextView = itemView.findViewById(R.id.chat_Time)
-
     }
 
     override fun getItemViewType(position: Int): Int {//여기서 뷰타입을 1, 2로 바꿔서 지정해줘야 내채팅 너채팅을 바꾸면서 쌓을 수 있음
