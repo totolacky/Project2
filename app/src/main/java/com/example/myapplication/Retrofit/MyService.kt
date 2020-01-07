@@ -1,8 +1,6 @@
 package com.example.myapplication.Retrofit
 
-import com.example.myapplication.ContactData
 import com.example.myapplication.GalleryData
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -54,8 +52,13 @@ interface MyService {
     fun getChatroom(@Field("id") id: String): Call<String>
 
     @FormUrlEncoded
+    @POST("/getChatLog")
+    // 채팅방 id를 보내면 대화기록을 보내줌
+    fun getChatLog(@Field("id") id: String): Call<ArrayList<String>>
+
+    @FormUrlEncoded
     @POST("/createChatroom")
-    // 유저 id를 보내면 그 사람의 채팅방 리스트를 보내줌
+    // 유저 _id 받아서 해당하는 채팅방 id 반환
     fun createChatroom(@Field("myId") myId: String, @Field("yourId") yourId: String): Call<String>
 
     @FormUrlEncoded

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import android.util.Log
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 
@@ -113,16 +114,33 @@ object Util {
         val jsonObject = JSONObject(json)
         val chatroomData = ChatroomData()
 
-        Log.d("Util",json.toString())
+        Log.d("Util",json)
 
-//        contactData._id = jsonObject.getString("_id")
-//        contactData.name = jsonObject.getString("name")
-//        contactData.country_code = jsonObject.getInt("country_code")
-//        contactData.profile_photo = jsonObject.getString("profile_photo")
-//        contactData.status = jsonObject.getString("status")
-//        if (contactData.status.equals("null"))
-//            contactData.status = ""
+        chatroomData.chatroom_name = jsonObject.getString("chatroom_name")
+        chatroomData.last_chat = jsonObject.getString("last_chat")
+        chatroomData.chatroom_image = jsonObject.getString("chatroom_image")
+        val ja = JSONArray(jsonObject.getString("people"))
+
+        Log.d("Util","ja = "+ja)
+
+        for (i in 0 until ja.length())
+            chatroomData.people.add(ja.getString(i))
+
+        Log.d("Util","people = "+chatroomData.people)
 
         return chatroomData
+    }
+
+    // Returns ChatData created from json string
+    fun getChatDataFramJson(json: String): ChatData {
+        Log.d("Util",json)
+        val jsonObject = JSONObject(json)
+        val chatData = ChatData()
+
+        chatData.date_time = jsonObject.getString("date_time")
+        chatData.id = jsonObject.getString("id")
+        chatData.script = jsonObject.getString("script")
+
+        return chatData
     }
 }
