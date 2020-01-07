@@ -207,6 +207,10 @@ class ChatRoomActivity: AppCompatActivity() {
         super.onStop()
         mSocket.disconnect()
     }
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
 
     fun sendMessage() {
         val now = System.currentTimeMillis()
