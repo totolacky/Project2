@@ -27,7 +27,6 @@ var clients = []
 MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
     if(err) console.log('Unable to connection to the mongoDB server.Error', err);
     else{
-
         // HTTP requests
 
         app.post('/login', (request,response,next)=>{
@@ -88,7 +87,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                         'friends': selectedUser[idx].friends,
                         'hashtag': selectedUser[idx].hashtag,
                     };
-    
+
                     console.log(userContactData.name)
 
                     var selectedPhoto=""
@@ -278,6 +277,72 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                                                 console.log('updated')
                                             });
                                             db.collection('user').updateOne({'facebookId':fbId},{$set: {'friends':friendFriends}},function(err,res){
+                                                if(err) throw err
+                                                console.log('updated')
+                                            });
+
+                                            response.json('Success')
+                                            console.log('Friend added: ' + user_me.name + ' and ' + user_friend.name);
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+
+        });
+
+        app.post('/addFriend', (request,response,next)=>{
+            var post_data = request.body;
+
+            var myId = post_data.myId;
+            var Id = post_data.newFriendId;
+
+            var db = client.db('penstagram');
+
+            if (myId === Id) {
+                response.json('You cannot add yourself as a friend.')
+                console.log('You cannot add yourself as a friend.')
+            }
+            else {
+                db.collection('user').find({'_id':mongoose.mongo.ObjectID(myId)}).count(function(err,number){
+                    if(number==0){
+                        response.json('Matching account does not exist. Is this really your Id?');
+                        console.log('Matching account does not exist. Is this really your Id?');
+                    }
+                    else{
+                        db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(myId)},function(err,user_me) {
+                            db.collection('user').find({'_id':mongoose.mongo.ObjectID(Id)}).count(function(err,n) {
+                                if(n==0){
+                                    response.json('Matching account does not exist. Is this an existing facebookId?');
+                                    console.log('Matching account does not exist. Is this an existing facebookId?');
+                                }
+                                else{
+                                    db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(Id)},function(err,user_friend){
+
+                                        // You and your new friend are both registered
+                                        console.log(user_me.friends)
+                                        console.log(user_me._id)
+                                        console.log(user_friend.friends)
+                                        console.log(user_friend._id)
+                                        var myFriends = user_me.friends
+                                        var friendFriends = user_friend.friends
+
+                                        if (myFriends.includes(user_friend._id.toString())) {
+                                            response.json('You are already friends.')
+                                            console.log('You are already friends.');
+                                        }
+                                        else {
+                                            myFriends.push(""+user_friend._id)
+                                            friendFriends.push(""+user_me._id)
+
+                                            db.collection('user').updateOne({'_id':mongoose.mongo.ObjectID(myId)},{$set: {'friends':myFriends}},function(err,res){
+                                                if(err) throw err
+                                                console.log('updated')
+                                            });
+                                            db.collection('user').updateOne({'_id':fmongoose.mongo.ObjectID(Id)},{$set: {'friends':friendFriends}},function(err,res){
                                                 if(err) throw err
                                                 console.log('updated')
                                             });
@@ -625,6 +690,20 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                 //console.log("client connected with sendList: "+sendList)
             })
 
+            socket.on('disconnect',function(){
+                console.log('Socket ID : ' + socket.id + ', Disconnect')
+
+                for (i=0; i<clients.length; i++) {
+                    if (clients[i].myId === myId) {
+                        clients.splice(i,1)
+                        break
+                    }
+                }
+
+                console.log('current client list: '+clients)
+
+            })
+
             socket.on('clientMessage', function(data){
                 console.log('Client Message : ' + JSON.stringify(data));
 
@@ -674,7 +753,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                     else {
                         var chat = res.chat
                         chat.push(sendData)
-                        db.collection('chatroom').updateOne({'_id': mongoose.mongo.ObjectID(chatroomId)},{$set: {'chat':chat}},function(err,res){
+                        db.collection('chatroom').updateOne({'_id': mongoose.mongo.ObjectID(chatroomId)},{$set: {'chat':chat, 'last_chat':data.script}},function(err,res){
                             if(err) throw err
                             console.log('New chat updated')
                         });
@@ -684,8 +763,3 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
         });
     }
 })
-
-// Additional functions
-var matchId = function (element,id) {
-    return obj.myId === id
-}

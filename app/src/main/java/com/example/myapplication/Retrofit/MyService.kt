@@ -33,6 +33,11 @@ interface MyService {
     fun addFriendFb(@Field("myFbId") myFbId: String, @Field("newFriendFbId") newFriendFbId: String): Call<String>
 
     @FormUrlEncoded
+    @POST("/addFriend")
+    // 나와 새 친구의 id를 보내면 서로 친구추가
+    fun addFriend(@Field("myId") myId: String, @Field("newFriendId") newFriendId: String): Call<String>
+
+    @FormUrlEncoded
     @POST("/getFriends")
     // id를 보내면 그 사람의 친구 리스트를 보내줌
     fun getFriends(@Field("id") id: String): Call<ArrayList<String>>
