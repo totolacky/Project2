@@ -50,46 +50,50 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             var post_data = request.body;
 
             var id = post_data.id;
+            var idx = post_data.idx;
 
             var db = client.db('penstagram');
 
             // user 랜덤 선택 (id ㄴㄴ) -> photo 랜덤 선택
-            var query = {'_id':{$ne:id}};
-            var totalCnt = db.collection('user').find(query).count(function(err,number){
+            //var query = {'_id':{$ne:id}};
+            //var totalCnt = db.collection('user').find().count(function(err,number){
 
-                var skipSize = Math.floor(Math.random()*number);
-                var selectedUser = db.collection('user').find(query).skip(skipSize).limit(1).toArray(function(err,selectedUser){
+                //var skipSize = Math.floor(Math.random()*number);
+                var selectedUser = db.collection('user').find({'_id':{$ne:id}}).toArray(function(err,selectedUser){
 
                     var userContactData = {
-                        'facebookId': selectedUser[0].facebookId,
-                        'name': selectedUser[0].name,
-                        'status': selectedUser[0].status,
-                        'country_code': selectedUser[0].country_code,
-                        'profile_photo':selectedUser[0].profile_photo,
-                        'photos': selectedUser[0].photos,
-                        'friends': selectedUser[0].friends,
-                        'hashtag': selectedUser[0].hashtag,
+                        'facebookId': selectedUser[idx].facebookId,
+                        'name': selectedUser[idx].name,
+                        'status': selectedUser[idx].status,
+                        'country_code': selectedUser[idx].country_code,
+                        'profile_photo':selectedUser[idx].profile_photo,
+                        'photos': selectedUser[idx].photos,
+                        'friends': selectedUser[idx].friends,
+                        'hashtag': selectedUser[idx].hashtag,
                     };
     
+                    console.log(selectedUser[idx].photos)
                     console.log(userContactData.name)
     
                     var selectedPhoto=""
     
-                    var photoArray = selectedUser[0].photos;
+                    var photoArray = selectedUser[idx].photos;
                     if(photoArray != null){
-                        var randNum = Math.floor(Math.random()*photoArray.length);
-                        selectedPhoto = photoArray[randNum]
+                        //var randNum = Math.floor(Math.random()*photoArray.length);
+                        selectedPhoto = photoArray[0] 
+                        response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
+                        console.log('Send data to init gallery success'); 
                     }
                     else{
-                        console.log('photoArray null');  
+                        console.log('photoArray null');
+                        response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
+                        console.log('Send data fail (selectedPhoto is null)'); 
                     }
-    
-                    response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
-                    console.log('Send data to init gallery success');  
+ 
                 });
 
 
-            });
+            //});
 
         });
 
@@ -113,6 +117,21 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             if(status == null) { status = "" }
             if(profile_photo == null) { profile_photo = "" }
 
+            console.log(typeof photos)
+            console.log(typeof friends)
+            console.log(typeof hashtag)
+            console.log(typeof chatroom)
+            
+            if(typeof photos == "string") {photos = [photos]}
+            if(typeof friends == "string") {friends = [friends]}
+            if(typeof hashtag == "string") {hashtag = [hashtag]}
+            if(typeof chatroom == "string") {chatroom = [chatroom]}
+
+            console.log(typeof photos)
+            console.log(typeof friends)
+            console.log(typeof hashtag)
+            console.log(typeof chatroom)
+        
 
             var insertJson = {
                 'facebookId': facebookId,
