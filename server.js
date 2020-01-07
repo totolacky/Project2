@@ -314,6 +314,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                     }
                     else{
                         db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(myId)},function(err,user_me) {
+                            console.log('???????????????'+Id)
                             db.collection('user').find({'_id':mongoose.mongo.ObjectID(Id)}).count(function(err,n) {
                                 if(n==0){
                                     response.json('Matching account does not exist. Is this an existing facebookId?');

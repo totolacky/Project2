@@ -22,6 +22,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.Serializable
+import kotlin.concurrent.thread
 
 class SignupActivity : AppCompatActivity() {
 
@@ -157,27 +158,26 @@ class SignupActivity : AppCompatActivity() {
 
             var myService: MyService = retrofit.create(MyService::class.java)
 
-            // 서버로 register 전송
-            myService.register(
-                contactData.facebookId,
-                contactData.name,
-                contactData.status,
-                contactData.country_code,
-                contactData.profile_photo,
-                contactData.photos,
-                contactData.friends,
-                contactData.hashtag,
-                contactData.chatroom
-            ).enqueue(object: Callback<String> {
-                override fun onFailure(call: Call<String>, t: Throwable){
-                    Log.e("register",t.message)
-                    Toast.makeText(applicationContext, "register fail", Toast.LENGTH_SHORT).show()
-                }
-                override fun onResponse(call: Call<String>, response: Response<String>){
-                    Log.d("id",response.body())
-                    id = response.body()
-                }
-            })
+            thread(start = true){
+                var retrofit = Retrofit.Builder()
+                    .baseUrl(Config.serverUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+
+                var myService: MyService = retrofit.create(MyService::class.java)
+
+                id = myService.register(
+                    contactData.facebookId,
+                    contactData.name,
+                    contactData.status,
+                    contactData.country_code,
+                    contactData.profile_photo,
+                    contactData.photos,
+                    contactData.friends,
+                    contactData.hashtag,
+                    contactData.chatroom
+                ).execute().body()
+            }.join()
 
             // Set next activity
             nextIntent = Intent(this, MainActivity::class.java)
