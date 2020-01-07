@@ -11,7 +11,7 @@ class TestBufferActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         var nextIntent = Intent(this, MainActivity::class.java)
-        nextIntent.putExtra("myId", "5e139c8aaf8d393ace9217ba")
+        nextIntent.putExtra("id", "5e14511f8688fa47667cba36")
         nextIntent.putExtra("chatroomId","5e139cb3af8d393ace9217c7")
 
         startActivity(nextIntent)
