@@ -56,11 +56,14 @@ class ChatRoomActivity: AppCompatActivity() {
         chat_recyclerview.layoutManager = lm
         chat_recyclerview.setHasFixedSize(true)//아이템이 추가삭제될때 크기측면에서 오류 안나게 해줌
 
-        connectSocket()
-
         chat_send_button.setOnClickListener {
             sendMessage()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        connectSocket()
     }
 
     fun initChatroom() {
@@ -126,10 +129,18 @@ class ChatRoomActivity: AppCompatActivity() {
         }
 
         // Join threads
-        for (t in threads) { t.join() }
+        for (t in threads) {
+            t.join()
+            Log.d("ChatRoomActivity","Thread joined.")
+        }
         threads = ArrayList()
 
         Log.d("ChatRoomActivity","+"+prof_images)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mSocket.disconnect()
     }
 
     fun sendMessage() {
