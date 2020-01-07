@@ -153,7 +153,7 @@ class ContactFragment : Fragment() {
 
                     var body = myService.getContactSimple(elem_id).execute().body()
                     Log.d("ContactFragment", "get contactdata - body is $body")
-                    resList.add(Util.getContactDataFramSimpleJson(body!!))
+                    resList.add(Util.getContactDataFromSimpleJson(body!!))
                 }
                 tmpThread.join()
             }

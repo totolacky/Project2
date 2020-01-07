@@ -211,9 +211,9 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                         var response = myService.getGalleryItem(myId, nowIdx).execute()
                         if (response.body() == null) Log.d("init galleryItem", "response body is null")
                         else {
-                            if (response.body()!!.selectedPhoto == "") Log.d(
-                                "init galleryItem",
-                                "selected photo is null || cannot get my own photo"
+                            if (response.body()!!.selectedPhoto == "" || response.body()!!.selectedPhoto == null) Log.d(
+                            "init galleryItem",
+                            "selected photo is null || cannot get my own photo"
                             )
                             else {
                                 Global.myGalleryList.add(

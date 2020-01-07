@@ -71,6 +71,11 @@ interface MyService {
     fun getChatroom(@Field("id") id: String): Call<String>
 
     @FormUrlEncoded
+    @POST("/getChatroomNum")
+    //
+    fun getChatroomNum(@Field("id") id: String): Call<Int>
+
+    @FormUrlEncoded
     @POST("/getChatLog")
     // 채팅방 id를 보내면 대화기록을 보내줌
     fun getChatLog(@Field("id") id: String): Call<ArrayList<String>>

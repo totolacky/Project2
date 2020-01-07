@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.Retrofit.MyService
@@ -121,7 +120,7 @@ class ChatRoomActivity: AppCompatActivity() {
                 if(result_body == null) {
                     Log.d("ChatRoomActivity","[Error] cannot get profile of $partId")
                 } else {
-                    val contactData = Util.getContactDataFramSimpleJson(result_body)
+                    val contactData = Util.getContactDataFromSimpleJson(result_body)
                     val name = contactData.name
                     var prof_image = when (contactData.profile_photo) {
                         ""      -> BitmapFactory.decodeResource(resources,R.drawable.def_icon)

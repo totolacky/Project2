@@ -12,6 +12,7 @@ import com.example.myapplication.*
 import com.example.myapplication.Retrofit.MyService
 import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.android.synthetic.main.fragment_contact.*
+import kotlinx.android.synthetic.main.layout_chatroom.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.concurrent.thread
@@ -61,7 +62,7 @@ class ChatFragment : Fragment() {
     fun initChatroom(){
         val addrList = getChatroomList()
         // onClick 설정
-        val mAdapter = ChatCorridorAdapter(requireContext(), addrList) { prof ->
+        val mAdapter = ChatCorridorAdapter(requireContext(), addrList, id) { prof ->
             Toast.makeText(context,"clicked: "+prof.chatroom_name, Toast.LENGTH_LONG).show()
             // view가 click되었을 때 실행할 것들
         }
@@ -74,7 +75,25 @@ class ChatFragment : Fragment() {
     }
 
     fun refreshChatroom() {
+        var adapter = cRecyclerView.adapter
+        var prevNum = adapter!!.itemCount
+        var currNum = -1
 
+        thread(start = true){
+            var retrofit = Retrofit.Builder()
+                .baseUrl(Config.serverUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            var myService: MyService = retrofit.create(MyService::class.java)
+
+            currNum = myService.getChatroomNum(id).execute().body()!!
+            Log.d("ChatFragment","prevnum is $prevNum, currNum is $currNum")
+        }.join()
+
+        if (prevNum != currNum) {
+            initChatroom()
+        }
     }
 
     fun getChatroomList(): ArrayList<ChatroomData?>? {
