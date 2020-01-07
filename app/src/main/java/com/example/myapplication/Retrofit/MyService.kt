@@ -47,6 +47,11 @@ interface MyService {
     // id를 보내면 그 사람의 단순화된 연락처를 보내줌
     fun getContactSimple(@Field("id") id: String): Call<String>
 
+    @FormUrlEncoded
+    @POST("/getContactNum")
+    // id를 보내면 그 사람의 단순화된 연락처를 보내줌
+    fun getContactNum(@Field("id") id: String): Call<Int>
+
 
 
     /////////////////// 갤러리
