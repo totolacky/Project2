@@ -3,8 +3,10 @@ package com.example.myapplication
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.ui.main.myGalleryHolder
 
@@ -33,6 +35,15 @@ class GalleryItemInformation : AppCompatActivity() {
         val flagId = "flag_"+thisItem.userInfo!!.country_code
         val resId = applicationContext.resources.getIdentifier(flagId,"drawable",applicationContext.packageName)
         userFlag.setImageBitmap(BitmapFactory.decodeResource(applicationContext.resources,resId))
+
+        val messageButton: ImageButton = findViewById(R.id.message)
+        messageButton.setOnClickListener {
+            Toast.makeText(getApplicationContext(), "You can send message to "+userName.text, Toast.LENGTH_SHORT).show()
+
+            // 채팅방으로 옮기기
+
+
+        }
 
     }
 

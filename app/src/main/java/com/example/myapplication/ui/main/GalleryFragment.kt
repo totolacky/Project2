@@ -42,14 +42,13 @@ class GalleryHolder{
 var myGalleryHolder = GalleryHolder()
 var myGalleryList: ArrayList<GalleryItem> = ArrayList()
 
-
+var getNew: Boolean = true
 
 class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInterface {
 
     lateinit var GalleryRecyclerView : RecyclerView
 
     lateinit var rootView : View
-
 
     var myId = ""
 
@@ -76,17 +75,10 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
         savedInstanceState: Bundle?
     ): View? {
 
-        // main에서 id받아오기
-        /*var bundle: Bundle? = getArguments()
-        if(bundle!=null){
-            Log.d("GalleryFragment","get bundle (not null)")
-            myId = bundle.getString("id")
+        if(getNew){
+            init()
+            getNew = false
         }
-        else{
-            Log.d("GalleryFragment","bundle is null")
-        }*/
-
-        init()
 
         rootView = inflater.inflate(R.layout.fragment_gallery, container, false)
 
@@ -127,12 +119,15 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
     }
 
 
-    var initNum: Int = 7
+    var initNum: Int = 14
 
     // 내 갤러리에는 남들의 사진들이 뜸
     fun init(){
+        myGalleryList.clear()
         // 서버한테 요청
+
         var cnt = 0
+        var idx = 0
         while(cnt<initNum) {
             /*myService.getGallery(myId)
                 .enqueue(object : Callback<GalleryData> {
@@ -161,7 +156,8 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
 
                 var myService: MyService = retrofit.create(MyService::class.java)
 
-                var response = myService.getGallery(myId).execute()
+                var response = myService.getGallery(myId, idx).execute()
+                idx++
                 if(response.body()==null) Log.d("gallery","response body is null")
                 else{
                     if(response.body()!!.selectedPhoto=="") Log.d("gallery","response body selected photo is null")

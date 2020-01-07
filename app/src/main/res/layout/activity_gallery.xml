@@ -14,6 +14,7 @@
         android:layout_width="fill_parent"
         android:layout_height="70dp"
         android:padding="5dip"
+        android:layout_marginTop="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -39,35 +40,6 @@
             android:layout_marginRight="0dip"
             android:src="@drawable/circle_mask" />
 
-        <TextView
-            android:id="@+id/user_status"
-            android:layout_width="fill_parent"
-            android:layout_height="26dip"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:layout_toEndOf="@id/user_image"
-            android:layout_toRightOf="@id/circle_mask"
-            android:ellipsize="marquee"
-            android:singleLine="true"
-            android:text="@string/default_status"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/user_name"
-            android:layout_width="fill_parent"
-            android:layout_height="20dip"
-            android:layout_alignWithParentIfMissing="true"
-            android:layout_above="@id/user_status"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_toEndOf="@id/user_image"
-            android:layout_toRightOf="@id/circle"
-            android:gravity="center_vertical"
-            android:text="@string/default_name"
-            android:textSize="20sp" />
-
         <ImageView
             android:id="@+id/user_flag"
             android:layout_width="50dp"
@@ -80,6 +52,41 @@
             android:foregroundGravity="center"
             android:src="@drawable/flag_0" />
 
+        <TextView
+            android:id="@+id/user_status"
+            android:layout_width="276dp"
+            android:layout_height="27dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toStartOf="@+id/user_flag"
+            android:layout_toLeftOf="@+id/user_flag"
+            android:layout_toEndOf="@id/user_image"
+            android:layout_toRightOf="@id/circle"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:text="@string/default_status"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="259dp"
+            android:layout_height="30dp"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_above="@id/user_status"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="1dp"
+            android:layout_toStartOf="@+id/user_flag"
+            android:layout_toLeftOf="@+id/user_flag"
+            android:layout_toEndOf="@id/user_image"
+            android:layout_toRightOf="@id/circle"
+            android:gravity="center_vertical"
+            android:text="@string/default_name"
+            android:textSize="20sp" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -87,6 +94,7 @@
         android:layout_width="fill_parent"
         android:layout_height="70dp"
         android:padding="5dip"
+        android:layout_marginBottom="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -96,29 +104,31 @@
 
         <TextView
             android:id="@+id/hashtags"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="430dip"
             android:layout_alignWithParentIfMissing="true"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
-            android:layout_marginLeft="13dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_toStartOf="@+id/message"
+            android:layout_toLeftOf="@+id/message"
             android:gravity="center_vertical"
             android:text="@string/default_hashtag"
             android:textSize="17sp" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/message"
-            android:layout_width="40dp"
+            android:layout_width="50dp"
             android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="6dip"
-            android:layout_marginRight="0dip"
-            android:foregroundGravity="center"
-            android:src="@drawable/message_icon" />
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/message_icon"
+            android:foregroundGravity="center" />
 
 
     </RelativeLayout>

@@ -44,10 +44,14 @@ interface MyService {
     // id를 보내면 그 사람의 단순화된 연락처 보내줌
     fun getContactSimple(@Field("id") id: String): Call<String>
 
+
+
+    /////////////////// 갤러리
+
     @FormUrlEncoded
     @POST("/initGallery")
     // 나 빼고 다른 user들의 photos + 그 user 정보
-    fun getGallery(@Field("id") id: String): Call<GalleryData>
+    fun getGallery(@Field("id") id: String, @Field("idx") idx: Int): Call<GalleryData>
 
     @FormUrlEncoded
     @POST("/upload")
