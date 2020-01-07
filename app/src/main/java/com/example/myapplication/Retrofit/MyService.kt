@@ -81,9 +81,9 @@ interface MyService {
     fun createChatroom(@Field("myId") myId: String, @Field("yourId") yourId: String): Call<String>
 
     @FormUrlEncoded
-    @POST("/initGallery")
+    @POST("/getGalleryItem")
     // 나 빼고 다른 user들의 photos + 그 user 정보
-    fun getGallery(@Field("id") id: String, @Field("idx") idx: Int): Call<GalleryData>
+    fun getGalleryItem(@Field("id") id: String, @Field("idx") idx: Int): Call<GalleryData>
 
     @FormUrlEncoded
     @POST("/upload")

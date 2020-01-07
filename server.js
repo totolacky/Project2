@@ -62,7 +62,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             })
         });
 
-        app.post('/initGallery', (request,response,next)=>{
+        app.post('/getGalleryItem', (request,response,next)=>{
             var post_data = request.body;
 
             var id = post_data.id;
@@ -75,42 +75,42 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             //var totalCnt = db.collection('user').find().count(function(err,number){
 
                 //var skipSize = Math.floor(Math.random()*number);
-                var selectedUser = db.collection('user').find({'_id':{$ne:id}}).toArray(function(err,selectedUser){
+            var selectedUser = db.collection('user').find().toArray(function(err,selectedUser){
 
-                    var userContactData = {
-                        '_id': selectedUser[idx]._id,
-                        'facebookId': selectedUser[idx].facebookId,
-                        'name': selectedUser[idx].name,
-                        'status': selectedUser[idx].status,
-                        'country_code': selectedUser[idx].country_code,
-                        'profile_photo':selectedUser[idx].profile_photo,
-                        'photos': selectedUser[idx].photos,
-                        'friends': selectedUser[idx].friends,
-                        'hashtag': selectedUser[idx].hashtag,
-                    };
+                var userContactData = {
+                    '_id': selectedUser[idx]._id,
+                    'facebookId': selectedUser[idx].facebookId,
+                    'name': selectedUser[idx].name,
+                    'status': selectedUser[idx].status,
+                    'country_code': selectedUser[idx].country_code,
+                    'profile_photo':selectedUser[idx].profile_photo,
+                    'photos': selectedUser[idx].photos,
+                    'friends': selectedUser[idx].friends,
+                    'hashtag': selectedUser[idx].hashtag,
+                };
+                // console.log(userContactData._id)
+                // console.log(id)
+                // console.log(userContactData.name)
 
-                    console.log(userContactData.name)
+                var selectedPhoto=""
 
-                    var selectedPhoto=""
-
+                if(id === userContactData._id){
+                    console.log('same id (cannot get my own photo)')
+                }
+                else{
                     var photoArray = selectedUser[idx].photos;
-                    if(photoArray != null){
+                    if(photoArray != []){
                         //var randNum = Math.floor(Math.random()*photoArray.length);
                         selectedPhoto = photoArray[0]
-                        response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
                         console.log('Send data to init gallery success');
                     }
                     else{
                         console.log('photoArray null');
-                        response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
-                        console.log('Send data fail (selectedPhoto is null)');
                     }
+                }
+                response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
 
-                });
-
-
-            //});
-
+            });
         });
 
         app.post('/register', (request,response,next)=>{
