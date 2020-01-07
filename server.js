@@ -70,13 +70,9 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
 
             var db = client.db('penstagram');
 
-            // user 랜덤 선택 (id ㄴㄴ) -> photo 랜덤 선택
-            //var query = {'_id':{$ne:id}};
-            //var totalCnt = db.collection('user').find().count(function(err,number){
-
-                //var skipSize = Math.floor(Math.random()*number);
-            db.collection('user').find().toArray(function(err,selectedUser){
-
+            // 나 아닌 유저들을 배열로 만든다
+            var query = {'_id':{$ne:mongoose.mongo.ObjectID(id)}};
+            db.collection('user').find(query).toArray(function(err,selectedUser){
                 var userContactData = {
                     '_id': selectedUser[idx]._id.toString(),
                     'facebookId': selectedUser[idx].facebookId,
@@ -92,24 +88,19 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                 console.log(id)
                 console.log(userContactData.name)
 
-                var selectedPhoto=""
+                var photoArray = selectedUser[idx].photos;
 
-                if(id == userContactData._id){
-                    console.log('same id (cannot get my own photo)')
+                var selectedPhoto = null;
+                if(photoArray.length>0){
+                    var randNum = Math.floor(Math.random()*photoArray.length);
+                    selectedPhoto = photoArray[randNum];
+                    console.log('select photo success')
                 }
                 else{
-                    var photoArray = selectedUser[idx].photos;
-                    if(photoArray == []){
-                        console.log('photoArray null');
-                    }
-                    else {
-                        //var randNum = Math.floor(Math.random()*photoArray.length);
-                        selectedPhoto = photoArray[0]
-                        console.log('Send data to init gallery success');
-                    }
+                    console.log('photoArray is empty')
                 }
-                response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
 
+                response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
             });
         });
 

@@ -173,7 +173,6 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
     }
 
 
-    var nowIdx: Int = -1
     var totalUserNum: Int = 0
 
     // 내 갤러리에는 남들의 사진들이 뜸
@@ -195,11 +194,8 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                 totalUserNum = response.body()!!
                 Log.d("init : totalUserNum", totalUserNum.toString())
 
-                // 서버 요청 2 : 사진, 정보 갖고오기
-                // nowIdx = 0 ~ totalUserNum-1 -> 내가 아니면 사진 받아오기
-                while (nowIdx < totalUserNum-1) {
-                    nowIdx++
-
+                // 서버 요청 2 : 사진, 정보 갖고오기 (총인원수-1 번 탐색 (나빼고니까))
+                for(idx in 0..totalUserNum-2){
                     var tmpThread2 = thread(start = true) {
                         var retrofit = Retrofit.Builder()
                             .baseUrl(serverUrl)
@@ -208,13 +204,12 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
 
                         var myService: MyService = retrofit.create(MyService::class.java)
 
-                        var response = myService.getGalleryItem(myId, nowIdx).execute()
+                        var response = myService.getGalleryItem(myId, idx).execute()
                         if (response.body() == null) Log.d("init galleryItem", "response body is null")
                         else {
-                            if (response.body()!!.selectedPhoto == "") Log.d(
-                                "init galleryItem",
-                                "selected photo is null || cannot get my own photo"
-                            )
+                            if (response.body()!!.selectedPhoto == null) {
+                                Log.d("init galleryItem","selected photo is null")
+                            }
                             else {
                                 Global.myGalleryList.add(
                                     GalleryItem(
@@ -237,6 +232,8 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
 
     // 새로고침하면 갤러리 다시 가져오기
     fun loadNewGallery(){
+        Global.myGalleryList.clear()
+
         // 서버 요청 1 : 총 유저 수
         var tmpThread1 = thread(start = true) {
             var retrofit = Retrofit.Builder()
@@ -247,47 +244,41 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
             var myService: MyService = retrofit.create(MyService::class.java)
 
             var response = myService.getUserNumber(myId).execute()
-            if (response.body() == null) Log.d("new getUserNumber", "response body is null")
+            if (response.body() == null) Log.d("nes getUserNumber", "response body is null")
             else {
-                // 사람이 늘었으면 내 갤러리에 그만큼 추가
-                if (totalUserNum < response.body()!!){
-                    // 서버 요청 2 : 사진, 정보 갖고오기
-                    // nowIdx = 원래totalUserNum ~ 현재totalUserNum-1 -> 내가 아니면 사진 받아오기
-                    totalUserNum = response.body()!!
-                    while (nowIdx < totalUserNum-1) {
-                        nowIdx++
+                totalUserNum = response.body()!!
+                Log.d("new : totalUserNum", totalUserNum.toString())
 
-                        var tmpThread2 = thread(start = true) {
-                            var retrofit = Retrofit.Builder()
-                                .baseUrl(serverUrl)
-                                .addConverterFactory(GsonConverterFactory.create())
-                                .build()
+                // 서버 요청 2 : 사진, 정보 갖고오기 (총인원수-1 번 탐색 (나빼고니까))
+                for(idx in 0..totalUserNum-2){
+                    var tmpThread2 = thread(start = true) {
+                        var retrofit = Retrofit.Builder()
+                            .baseUrl(serverUrl)
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build()
 
-                            var myService: MyService = retrofit.create(MyService::class.java)
+                        var myService: MyService = retrofit.create(MyService::class.java)
 
-                            var response = myService.getGalleryItem(myId, nowIdx).execute()
-                            if (response.body() == null) Log.d("new galleryItem", "response body is null")
-                            else {
-                                if (response.body()!!.selectedPhoto == "") Log.d(
-                                    "new galleryItem",
-                                    "selected photo is null || cannot get my own photo"
-                                )
-                                else {
-                                    Global.myGalleryList.add(
-                                        GalleryItem(
-                                            Util.getBitmapFromString(response.body()!!.selectedPhoto),
-                                            response.body()!!.userContactData
-                                        )
-                                    )
-                                }
+                        var response = myService.getGalleryItem(myId, idx).execute()
+                        if (response.body() == null) Log.d("new galleryItem", "response body is null")
+                        else {
+                            if (response.body()!!.selectedPhoto == null) {
+                                Log.d("new galleryItem","selected photo is null")
                             }
-
+                            else {
+                                Global.myGalleryList.add(
+                                    GalleryItem(
+                                        Util.getBitmapFromString(response.body()!!.selectedPhoto),
+                                        response.body()!!.userContactData
+                                    )
+                                )
+                            }
                         }
-
-                        tmpThread2.join()
                     }
-                    Log.d("new gallery", "new users' photos and ContactDatas added")
+                    tmpThread2.join()
                 }
+                Global.myGalleryHolder.setDataList(Global.myGalleryList)
+                Log.d("new gallery", "other users' photos and ContactDatas")
             }
         }
         tmpThread1.join()
