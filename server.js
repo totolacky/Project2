@@ -75,10 +75,10 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             //var totalCnt = db.collection('user').find().count(function(err,number){
 
                 //var skipSize = Math.floor(Math.random()*number);
-            var selectedUser = db.collection('user').find().toArray(function(err,selectedUser){
+            db.collection('user').find().toArray(function(err,selectedUser){
 
                 var userContactData = {
-                    '_id': selectedUser[idx]._id,
+                    '_id': selectedUser[idx]._id.toString(),
                     'facebookId': selectedUser[idx].facebookId,
                     'name': selectedUser[idx].name,
                     'status': selectedUser[idx].status,
@@ -88,24 +88,24 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                     'friends': selectedUser[idx].friends,
                     'hashtag': selectedUser[idx].hashtag,
                 };
-                // console.log(userContactData._id)
-                // console.log(id)
-                // console.log(userContactData.name)
+                console.log(userContactData._id)
+                console.log(id)
+                console.log(userContactData.name)
 
                 var selectedPhoto=""
 
-                if(id === userContactData._id){
+                if(id == userContactData._id){
                     console.log('same id (cannot get my own photo)')
                 }
                 else{
                     var photoArray = selectedUser[idx].photos;
-                    if(photoArray != []){
+                    if(photoArray == []){
+                        console.log('photoArray null');
+                    }
+                    else {
                         //var randNum = Math.floor(Math.random()*photoArray.length);
                         selectedPhoto = photoArray[0]
                         console.log('Send data to init gallery success');
-                    }
-                    else{
-                        console.log('photoArray null');
                     }
                 }
                 response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});

@@ -197,7 +197,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
 
                 // 서버 요청 2 : 사진, 정보 갖고오기
                 // nowIdx = 0 ~ totalUserNum-1 -> 내가 아니면 사진 받아오기
-                while (nowIdx < totalUserNum) {
+                while (nowIdx < totalUserNum-1) {
                     nowIdx++
 
                     var tmpThread2 = thread(start = true) {
@@ -254,7 +254,9 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                     // 서버 요청 2 : 사진, 정보 갖고오기
                     // nowIdx = 원래totalUserNum ~ 현재totalUserNum-1 -> 내가 아니면 사진 받아오기
                     totalUserNum = response.body()!!
-                    while (nowIdx < totalUserNum) {
+                    while (nowIdx < totalUserNum-1) {
+                        nowIdx++
+
                         var tmpThread2 = thread(start = true) {
                             var retrofit = Retrofit.Builder()
                                 .baseUrl(serverUrl)
