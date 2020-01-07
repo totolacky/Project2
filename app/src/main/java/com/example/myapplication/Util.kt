@@ -1,13 +1,18 @@
 package com.example.myapplication
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import android.util.Log
+import com.example.myapplication.Retrofit.MyService
 import org.json.JSONArray
 import org.json.JSONObject
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.ByteArrayOutputStream
 import java.util.*
+import kotlin.concurrent.thread
 
 
 object Util {
@@ -93,7 +98,7 @@ object Util {
     }
 
     // Returns ContactData created from simple json string containing _id, name, profile_photo, status, country_cde
-    fun getContactDataFramSimpleJson(json: String): ContactData {
+    fun getContactDataFromSimpleJson(json: String): ContactData {
         val jsonObject = JSONObject(json)
         val contactData = ContactData()
 
@@ -162,5 +167,50 @@ object Util {
         }
 
         return this
+    }
+
+    fun getNameFromId(id: String): String {
+        var name = ""
+        thread(start = true){
+            var retrofit = Retrofit.Builder()
+                .baseUrl(Config.serverUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            var myService: MyService = retrofit.create(MyService::class.java)
+
+            name = getContactDataFromSimpleJson(myService.getContactSimple(id).execute().body()!!).name
+        }.join()
+        return name
+    }
+
+    fun getProfileImageFromId(id: String): Bitmap? {
+        var p_image: Bitmap? = null
+        thread(start = true){
+            var retrofit = Retrofit.Builder()
+                .baseUrl(Config.serverUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            var myService: MyService = retrofit.create(MyService::class.java)
+
+            p_image = getBitmapFromString(getContactDataFromSimpleJson(myService.getContactSimple(id).execute().body()!!).profile_photo)
+        }.join()
+        return p_image
+    }
+
+    fun getCountryFromId(id: String): Int? {
+        var res = -1
+        thread(start = true){
+            var retrofit = Retrofit.Builder()
+                .baseUrl(Config.serverUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            var myService: MyService = retrofit.create(MyService::class.java)
+
+            res = getContactDataFromSimpleJson(myService.getContactSimple(id).execute().body()!!).country_code
+        }.join()
+        return res
     }
 }

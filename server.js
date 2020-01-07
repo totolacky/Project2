@@ -5,7 +5,7 @@ var socketio = require('socket.io');
 //var ObjectID = mongodb.ObjectID;
 var express = require('express')
 var bodyParser = require('body-parser')
-
+var translate = require('google-translate-api')
 
 // Create Express Service
 var app = express();
@@ -28,6 +28,43 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
     if(err) console.log('Unable to connection to the mongoDB server.Error', err);
     else{
         // HTTP requests
+
+        app.post('/translate', (request,response,next)=>{
+            var post_data = request.body
+
+            var script = post_data.script
+            var target_lang = post_data.target_lang
+
+            var res_script
+            var from_lang
+            var typo
+            var corrected
+
+            console.log('script: '+script)
+            console.log('target_lang: '+target_lang)
+
+            translate(script,{to: target_lang}).then(res => {
+                //console.log(JSON.stringify(res))
+                res_script = res.text
+                from_lang = res.from.language.iso
+                typo = res.from.text.autoCorrected
+                corrected = res.from.text.value
+                console.log('something is going on')
+                var resJson = {
+                    'res_script': res_script,
+                    'from_lang': from_lang,
+                    'typo': typo,
+                    'corrected': corrected
+                }
+
+                console.log(JSON.stringify(resJson))
+                response.json(JSON.stringify(resJson))
+            }).catch(err => {
+                console.error(err)
+            });
+
+
+        });
 
         app.post('/login', (request,response,next)=>{
             var post_data = request.body;
@@ -618,6 +655,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                 }
             })
         });
+
 
         // Start Web Server
         var server = app.listen(80, ()=>{

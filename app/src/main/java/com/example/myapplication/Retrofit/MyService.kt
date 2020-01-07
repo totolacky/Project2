@@ -1,6 +1,7 @@
 package com.example.myapplication.Retrofit
 
 import com.example.myapplication.GalleryData
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -47,6 +48,11 @@ interface MyService {
     // id를 보내면 그 사람의 단순화된 연락처를 보내줌
     fun getContactSimple(@Field("id") id: String): Call<String>
 
+    @FormUrlEncoded
+    @POST("/getContactNum")
+    // id를 보내면 그 사람의 단순화된 연락처를 보내줌
+    fun getContactNum(@Field("id") id: String): Call<Int>
+
 
 
     /////////////////// 갤러리
@@ -54,6 +60,19 @@ interface MyService {
     @FormUrlEncoded
     @POST("/userNumber")
     fun getUserNumber(@Field("id") id: String): Call<Int>
+
+    @FormUrlEncoded
+    @POST("/getGalleryItem")
+    // 나 빼고 다른 user들의 photos + 그 user 정보
+    fun getGalleryItem(@Field("id") id: String, @Field("idx") idx: Int): Call<GalleryData>
+
+    @FormUrlEncoded
+    @POST("/upload")
+    fun uploadPhoto(@Field("id") id: String, @Field("photo") photo: String): Call<String>
+
+
+
+    //////////////////// 채팅
 
     @FormUrlEncoded
     @POST("/getChatrooms")
@@ -66,6 +85,11 @@ interface MyService {
     fun getChatroom(@Field("id") id: String): Call<String>
 
     @FormUrlEncoded
+    @POST("/getChatroomNum")
+    //
+    fun getChatroomNum(@Field("id") id: String): Call<Int>
+
+    @FormUrlEncoded
     @POST("/getChatLog")
     // 채팅방 id를 보내면 대화기록을 보내줌
     fun getChatLog(@Field("id") id: String): Call<ArrayList<String>>
@@ -76,12 +100,8 @@ interface MyService {
     fun createChatroom(@Field("myId") myId: String, @Field("yourId") yourId: String): Call<String>
 
     @FormUrlEncoded
-    @POST("/initGallery")
-    // 나 빼고 다른 user들의 photos + 그 user 정보
-    fun getGallery(@Field("id") id: String, @Field("idx") idx: Int): Call<GalleryData>
-
-    @FormUrlEncoded
-    @POST("/upload")
-    fun uploadPhoto(@Field("id") id: String, @Field("photo") photo: String): Call<String>
+    @POST("/translate")
+    //
+    fun translate(@Field("script") script: String, @Field("target_lang") tarrget_lang: String): Call<String>
 
 }

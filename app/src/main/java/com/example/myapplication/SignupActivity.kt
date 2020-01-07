@@ -60,7 +60,7 @@ class SignupActivity : AppCompatActivity() {
         }
 
         select_language.setOnClickListener {
-            Toast.makeText(applicationContext, "Select_language clicked",Toast.LENGTH_LONG).show()
+            //Toast.makeText(applicationContext, "Select_language clicked",Toast.LENGTH_LONG).show()
 
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Which language do you use?")
@@ -90,7 +90,7 @@ class SignupActivity : AppCompatActivity() {
             builder.create().show()
         }
         nextButton.setOnClickListener {
-            Toast.makeText(applicationContext, "Next button clicked",Toast.LENGTH_LONG).show()
+            //Toast.makeText(applicationContext, "Next button clicked",Toast.LENGTH_LONG).show()
             contactData.name = nameEditText.text.toString()
             moveOn()
         }
@@ -100,7 +100,7 @@ class SignupActivity : AppCompatActivity() {
         setContentView(R.layout.activity_signup_1)
 
         nextButton.setOnClickListener {
-            Toast.makeText(applicationContext, "Next button clicked",Toast.LENGTH_LONG).show()
+            //Toast.makeText(applicationContext, "Next button clicked",Toast.LENGTH_LONG).show()
             contactData.status = statusEditText.text.toString()
             moveOn()
         }
@@ -119,7 +119,7 @@ class SignupActivity : AppCompatActivity() {
 
             // onClick 설정
             val mAdapter = HashtagAdapter(this, hashtagList) { prof ->
-                Toast.makeText(this,"clicked",Toast.LENGTH_LONG).show()
+                //Toast.makeText(this,"clicked",Toast.LENGTH_LONG).show()
                 // view가 click되었을 때 실행할 것들
             }
 
@@ -131,7 +131,7 @@ class SignupActivity : AppCompatActivity() {
         }
 
         nextButton.setOnClickListener {
-            Toast.makeText(applicationContext, "Finish button clicked",Toast.LENGTH_LONG).show()
+            //Toast.makeText(applicationContext, "Finish button clicked",Toast.LENGTH_LONG).show()
             contactData.hashtag = hashtagList as ArrayList<String>
             moveOn()
         }

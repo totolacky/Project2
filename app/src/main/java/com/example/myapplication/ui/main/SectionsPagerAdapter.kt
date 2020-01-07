@@ -40,4 +40,6 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager, us
         // Show 2 total pages.
         return 3
     }
+
+
 }

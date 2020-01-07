@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlin.collections.ArrayList
 
-class ChatAdapter(val context: Context, val arrayList: ArrayList<ChatData>, val prof_images: HashMap<String,Pair<String,Bitmap>>, val id: String)
+class ChatAdapter(val context: Context, val arrayList: ArrayList<ChatData>, val prof_images: HashMap<String,Pair<String,Bitmap>>, val id: String, val itemClick: (ChatData,Boolean) -> Unit)
     :  RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     val myid = id
@@ -46,6 +46,7 @@ class ChatAdapter(val context: Context, val arrayList: ArrayList<ChatData>, val 
         if (viewHolder is Holder) {
             viewHolder.chat_Text.text = arrayList[i].script
             viewHolder.chat_Time.text = arrayList[i].date_time
+            viewHolder.itemView.setOnClickListener{ itemClick(arrayList[i],true) }
         }
         //onCreateViewHolder에서 리턴받은 뷰홀더가 Holder2라면 상대의 채팅, item_your_chat의 뷰들을 초기화 해줌
         else if(viewHolder is Holder2) {
@@ -61,6 +62,7 @@ class ChatAdapter(val context: Context, val arrayList: ArrayList<ChatData>, val 
             viewHolder.chat_You_Name.text = name
             viewHolder.chat_Text.text = arrayList[i].script
             viewHolder.chat_Time.text = arrayList[i].date_time
+            viewHolder.itemView.setOnClickListener{ itemClick(arrayList[i],false) }
         }
     }
 

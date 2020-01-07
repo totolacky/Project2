@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import com.example.myapplication.*
 import com.example.myapplication.Retrofit.MyService
 import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.android.synthetic.main.fragment_contact.*
+import kotlinx.android.synthetic.main.layout_chatroom.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.concurrent.thread
@@ -28,6 +30,11 @@ class ChatFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_chat, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initChatroom()
     }
 
     override fun onStart() {
@@ -53,12 +60,16 @@ class ChatFragment : Fragment() {
         }
     }
 
-    fun refreshChatroom(){
+    fun initChatroom(){
         val addrList = getChatroomList()
         // onClick 설정
-        val mAdapter = ChatCorridorAdapter(requireContext(), addrList) { prof ->
-            Toast.makeText(context,"clicked: "+prof.chatroom_name, Toast.LENGTH_LONG).show()
+        val mAdapter = ChatCorridorAdapter(requireContext(), addrList, id) { prof ->
+            //Toast.makeText(context,"clicked: "+prof.chatroom_name, Toast.LENGTH_LONG).show()
             // view가 click되었을 때 실행할 것들
+            var nextIntent = Intent(context, ChatRoomActivity::class.java)
+            nextIntent.putExtra("myId",id)
+            nextIntent.putExtra("chatroomId",prof.chatroom_id)
+            startActivity(nextIntent)
         }
 
         cRecyclerView.adapter = mAdapter
@@ -68,10 +79,10 @@ class ChatFragment : Fragment() {
         cRecyclerView.setHasFixedSize(true)
     }
 
-    fun getChatroomList(): ArrayList<ChatroomData?>? {
-        // Fetch contact list from server
-        var idList: ArrayList<String>? = ArrayList()
-        var resList: ArrayList<ChatroomData?> = ArrayList()
+    fun refreshChatroom() {
+        var adapter = cRecyclerView.adapter
+        var prevNum = adapter!!.itemCount
+        var currNum = -1
 
         thread(start = true){
             var retrofit = Retrofit.Builder()
@@ -81,13 +92,40 @@ class ChatFragment : Fragment() {
 
             var myService: MyService = retrofit.create(MyService::class.java)
 
-            idList = myService.getChatrooms(id).execute().body()
-            Log.d("ContactFragment","idList is $idList")
+            currNum = myService.getChatroomNum(id).execute().body()!!
+            Log.d("ChatFragment","prevnum is $prevNum, currNum is $currNum")
         }.join()
 
-        for (elem_id in idList!!) {
+        if (prevNum != currNum) {
+            initChatroom()
+        }
+    }
+
+    fun getChatroomList(): ArrayList<ChatroomData?>? {
+        Log.d("ChatFragment","getChatroomList called")
+        // Fetch contact list from server
+        var idList: ArrayList<String>? = ArrayList()
+        var resList: ArrayList<ChatroomData?> = ArrayList()
+
+        thread(start = true){
+            Log.d("ChatFragment","First thread entered")
+            var retrofit = Retrofit.Builder()
+                .baseUrl(Config.serverUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            var myService: MyService = retrofit.create(MyService::class.java)
+
+            idList = myService.getChatrooms(id).execute().body()
+            Log.d("ChatFragment","idList is $idList")
+        }.join()
+
+        Log.d("ChatFragment","Joined first thread")
+
+        for (i in 0 until idList!!.size) {
+            var elem_id = idList!![i]
             thread(start = true){
-                Log.d("ContactFragment","get contactdata - id is $elem_id")
+                Log.d("ChatFragment","get chatdata - id is $elem_id")
                 var retrofit = Retrofit.Builder()
                     .baseUrl(Config.serverUrl)
                     .addConverterFactory(GsonConverterFactory.create())
@@ -96,9 +134,10 @@ class ChatFragment : Fragment() {
                 var myService: MyService = retrofit.create(MyService::class.java)
 
                 var body = myService.getChatroom(elem_id).execute().body()
-                Log.d("ContactFragment","get contactdata - body is $body")
+                Log.d("ChatFragment","get chatdata - body is $body")
                 resList.add(Util.getChatroomDataFramJson(body!!))
             }.join()
+            Log.d("ChatFragment","Joined other threads")
         }
 
         return resList

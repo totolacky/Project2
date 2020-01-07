@@ -173,7 +173,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
     }
 
 
-    var initNum: Int = 0
+    var totalUserNum: Int = 0
 
     // 내 갤러리에는 남들의 사진들이 뜸
     fun init(){
@@ -191,14 +191,11 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
             var response = myService.getUserNumber(myId).execute()
             if (response.body() == null) Log.d("init getUserNumber", "response body is null")
             else {
-                initNum = response.body()!! - 1
-                Log.d("initNum", initNum.toString())
+                totalUserNum = response.body()!!
+                Log.d("init : totalUserNum", totalUserNum.toString())
 
-                // 서버 요청 2 (initNum 번 반복) : 사진, 정보 갖고오기
-                var cnt = 0
-                var idx = 0
-                while (cnt < initNum) {
-
+                // 서버 요청 2 : 사진, 정보 갖고오기 (총인원수-1 번 탐색 (나빼고니까))
+                for(idx in 0..totalUserNum-2){
                     var tmpThread2 = thread(start = true) {
                         var retrofit = Retrofit.Builder()
                             .baseUrl(serverUrl)
@@ -207,14 +204,12 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
 
                         var myService: MyService = retrofit.create(MyService::class.java)
 
-                        var response = myService.getGallery(myId, idx).execute()
-                        idx++
-                        if (response.body() == null) Log.d("gallery", "response body is null")
+                        var response = myService.getGalleryItem(myId, idx).execute()
+                        if (response.body() == null) Log.d("init galleryItem", "response body is null")
                         else {
-                            if (response.body()!!.selectedPhoto == "") Log.d(
-                                "gallery",
-                                "response body selected photo is null"
-                            )
+                            if (response.body()!!.selectedPhoto == null) {
+                                Log.d("init galleryItem","selected photo is null")
+                            }
                             else {
                                 Global.myGalleryList.add(
                                     GalleryItem(
@@ -222,12 +217,9 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                                         response.body()!!.userContactData
                                     )
                                 )
-                                cnt++
                             }
                         }
-
                     }
-
                     tmpThread2.join()
                 }
                 Global.myGalleryHolder.setDataList(Global.myGalleryList)
@@ -240,6 +232,8 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
 
     // 새로고침하면 갤러리 다시 가져오기
     fun loadNewGallery(){
+        Global.myGalleryList.clear()
+
         // 서버 요청 1 : 총 유저 수
         var tmpThread1 = thread(start = true) {
             var retrofit = Retrofit.Builder()
@@ -250,49 +244,41 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
             var myService: MyService = retrofit.create(MyService::class.java)
 
             var response = myService.getUserNumber(myId).execute()
-            if (response.body() == null) Log.d("new getUserNumber", "response body is null")
+            if (response.body() == null) Log.d("nes getUserNumber", "response body is null")
             else {
-                // 사람이 늘었으면 내 갤러리에 그만큼 추가
-                if (initNum < response.body()!! - 1){
-                    // 서버 요청 2 : 사진, 정보 갖고오기
-                    var cnt = initNum
-                    var idx = initNum
-                    initNum = response.body()!! - 1
-                    while (cnt < initNum) {
+                totalUserNum = response.body()!!
+                Log.d("new : totalUserNum", totalUserNum.toString())
 
-                        var tmpThread2 = thread(start = true) {
-                            var retrofit = Retrofit.Builder()
-                                .baseUrl(serverUrl)
-                                .addConverterFactory(GsonConverterFactory.create())
-                                .build()
+                // 서버 요청 2 : 사진, 정보 갖고오기 (총인원수-1 번 탐색 (나빼고니까))
+                for(idx in 0..totalUserNum-2){
+                    var tmpThread2 = thread(start = true) {
+                        var retrofit = Retrofit.Builder()
+                            .baseUrl(serverUrl)
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build()
 
-                            var myService: MyService = retrofit.create(MyService::class.java)
+                        var myService: MyService = retrofit.create(MyService::class.java)
 
-                            var response = myService.getGallery(myId, idx).execute()
-                            idx++
-                            if (response.body() == null) Log.d("new gallery", "response body is null")
-                            else {
-                                if (response.body()!!.selectedPhoto == "") Log.d(
-                                    "new gallery","response body selected photo is null"
-                                )
-                                else {
-                                    Global.myGalleryList.add(
-                                        GalleryItem(
-                                            Util.getBitmapFromString(response.body()!!.selectedPhoto),
-                                            response.body()!!.userContactData
-                                        )
-                                    )
-                                    cnt++
-                                }
+                        var response = myService.getGalleryItem(myId, idx).execute()
+                        if (response.body() == null) Log.d("new galleryItem", "response body is null")
+                        else {
+                            if (response.body()!!.selectedPhoto == null) {
+                                Log.d("new galleryItem","selected photo is null")
                             }
-
+                            else {
+                                Global.myGalleryList.add(
+                                    GalleryItem(
+                                        Util.getBitmapFromString(response.body()!!.selectedPhoto),
+                                        response.body()!!.userContactData
+                                    )
+                                )
+                            }
                         }
-
-                        tmpThread2.join()
                     }
-                    Log.d("new gallery", "new users' photos and ContactDatas added")
+                    tmpThread2.join()
                 }
-
+                Global.myGalleryHolder.setDataList(Global.myGalleryList)
+                Log.d("new gallery", "other users' photos and ContactDatas")
             }
         }
         tmpThread1.join()
