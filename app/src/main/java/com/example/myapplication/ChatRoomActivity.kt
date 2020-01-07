@@ -182,15 +182,21 @@ class ChatRoomActivity: AppCompatActivity() {
 
     // 서버로부터 전달받은 'chat-message' Event 처리.
     private val onMessageReceived = Emitter.Listener { args ->
-        // 전달받은 데이터는 아래와 같이 추출할 수 있습니다.
-        try {
-            val receivedData = args[0] as JSONObject
-            Log.d("ChatRoomActivity", "message recieved - "+receivedData.toString())
-        } catch (e: JSONException) {
-            e.printStackTrace()
+        runOnUiThread {
+            try {
+                val receivedData = args[0] as JSONObject
+                val chatData = Util.getChatDataFramJson(receivedData)
+
+                cAdapter.addItem(chatData)
+                cAdapter.notifyDataSetChanged()
+
+                Log.d("ChatRoomActivity", "message recieved - " + receivedData.toString())
+            } catch (e: JSONException) {
+                Log.d("ChatRoomActivity", "message not recieved")
+                e.printStackTrace()
+            }
         }
     }
-
 }
 
 

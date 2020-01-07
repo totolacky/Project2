@@ -134,7 +134,10 @@ object Util {
     // Returns ChatData created from json string
     fun getChatDataFramJson(json: String): ChatData {
         Log.d("Util",json)
-        val jsonObject = JSONObject(json)
+        return getChatDataFramJson(JSONObject(json))
+    }
+
+    fun getChatDataFramJson(jsonObject: JSONObject): ChatData {
         val chatData = ChatData()
 
         chatData.date_time = jsonObject.getString("date_time")

@@ -27,7 +27,7 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager, us
         when(position){
             0 -> return ContactFragment.newInstance(id)
             1 -> return ChatFragment.newInstance(id)
-            2 -> return GalleryFragment.newInstance(id)
+            //2 -> return GalleryFragment.newInstance(id)
             else -> return PlaceholderFragment()
         }
     }
