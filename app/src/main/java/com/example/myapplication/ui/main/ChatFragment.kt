@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -63,8 +64,12 @@ class ChatFragment : Fragment() {
         val addrList = getChatroomList()
         // onClick 설정
         val mAdapter = ChatCorridorAdapter(requireContext(), addrList, id) { prof ->
-            Toast.makeText(context,"clicked: "+prof.chatroom_name, Toast.LENGTH_LONG).show()
+            //Toast.makeText(context,"clicked: "+prof.chatroom_name, Toast.LENGTH_LONG).show()
             // view가 click되었을 때 실행할 것들
+            var nextIntent = Intent(context, ChatRoomActivity::class.java)
+            nextIntent.putExtra("myId",id)
+            nextIntent.putExtra("chatroomId",prof.chatroom_id)
+            startActivity(nextIntent)
         }
 
         cRecyclerView.adapter = mAdapter

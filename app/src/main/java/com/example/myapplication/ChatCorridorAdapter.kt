@@ -56,7 +56,7 @@ class ChatCorridorAdapter(val context: Context, val chatroomList: ArrayList<Chat
             chatroom_lastchat?.text = prof.last_chat
 
             // 프로필 사진 설정
-            var chatroom_photo= BitmapFactory.decodeResource(context.resources,R.drawable.flag_0)
+            var chatroom_photo: Bitmap? = null
             if (prof.chatroom_image != "") {
                 chatroom_photo = Util.getBitmapFromString(prof.chatroom_image!!)!!
             } else {
@@ -67,6 +67,8 @@ class ChatCorridorAdapter(val context: Context, val chatroomList: ArrayList<Chat
                     }
                 }
             }
+            if (chatroom_photo == null)
+                chatroom_photo = BitmapFactory.decodeResource(context.resources,R.drawable.flag_0)
             chatroom_image.setImageBitmap(Util.resizingBitmap(Util.squareBitmap(chatroom_photo),120))
 
             // OnClickListener 설정

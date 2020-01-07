@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
@@ -183,7 +184,7 @@ object Util {
         return name
     }
 
-    fun getProfileImageFromId(id: String): Bitmap {
+    fun getProfileImageFromId(id: String): Bitmap? {
         var p_image: Bitmap? = null
         thread(start = true){
             var retrofit = Retrofit.Builder()
@@ -195,9 +196,7 @@ object Util {
 
             p_image = getBitmapFromString(getContactDataFromSimpleJson(myService.getContactSimple(id).execute().body()!!).profile_photo)
         }.join()
-        if(p_image == null)
-            p_image = Util.getDefPhoto()
-        return p_image!!
+        return p_image
     }
 
     fun getDefPhoto() : Bitmap {

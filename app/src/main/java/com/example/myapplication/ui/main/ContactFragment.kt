@@ -66,7 +66,7 @@ class ContactFragment : Fragment() {
 
         // onClick 설정
         mAdapter = ContactAdapter(requireContext(), addrList) { prof ->
-            Toast.makeText(context,"clicked: "+prof.name,Toast.LENGTH_LONG).show()
+            //Toast.makeText(context,"clicked: "+prof.name,Toast.LENGTH_LONG).show()
             // view가 click되었을 때 실행할 것들
 
             val your_id = prof._id
