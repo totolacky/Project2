@@ -78,6 +78,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                 var selectedUser = db.collection('user').find({'_id':{$ne:id}}).toArray(function(err,selectedUser){
 
                     var userContactData = {
+                        '_id': selectedUser[idx]._id,
                         'facebookId': selectedUser[idx].facebookId,
                         'name': selectedUser[idx].name,
                         'status': selectedUser[idx].status,
@@ -343,7 +344,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                                                 if(err) throw err
                                                 console.log('updated')
                                             });
-                                            db.collection('user').updateOne({'_id':fmongoose.mongo.ObjectID(Id)},{$set: {'friends':friendFriends}},function(err,res){
+                                            db.collection('user').updateOne({'_id':mongoose.mongo.ObjectID(Id)},{$set: {'friends':friendFriends}},function(err,res){
                                                 if(err) throw err
                                                 console.log('updated')
                                             });
