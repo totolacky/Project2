@@ -61,6 +61,19 @@ interface MyService {
     fun getUserNumber(@Field("id") id: String): Call<Int>
 
     @FormUrlEncoded
+    @POST("/getGalleryItem")
+    // 나 빼고 다른 user들의 photos + 그 user 정보
+    fun getGalleryItem(@Field("id") id: String, @Field("idx") idx: Int): Call<GalleryData>
+
+    @FormUrlEncoded
+    @POST("/upload")
+    fun uploadPhoto(@Field("id") id: String, @Field("photo") photo: String): Call<String>
+
+
+
+    //////////////////// 채팅
+
+    @FormUrlEncoded
     @POST("/getChatrooms")
     // 유저 id를 보내면 그 사람의 채팅방 리스트를 보내줌
     fun getChatrooms(@Field("id") id: String): Call<ArrayList<String>>
@@ -84,14 +97,5 @@ interface MyService {
     @POST("/createChatroom")
     // 유저 _id 받아서 해당하는 채팅방 id 반환
     fun createChatroom(@Field("myId") myId: String, @Field("yourId") yourId: String): Call<String>
-
-    @FormUrlEncoded
-    @POST("/getGalleryItem")
-    // 나 빼고 다른 user들의 photos + 그 user 정보
-    fun getGalleryItem(@Field("id") id: String, @Field("idx") idx: Int): Call<GalleryData>
-
-    @FormUrlEncoded
-    @POST("/upload")
-    fun uploadPhoto(@Field("id") id: String, @Field("photo") photo: String): Call<String>
 
 }

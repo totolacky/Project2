@@ -62,7 +62,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             })
         });
 
-        app.post('/initGallery', (request,response,next)=>{
+        app.post('/getGalleryItem', (request,response,next)=>{
             var post_data = request.body;
 
             var id = post_data.id;
