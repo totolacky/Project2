@@ -23,7 +23,10 @@ import kotlin.concurrent.thread
  */
 class ContactFragment : Fragment() {
 
-    var id = "5e13631eb4733f33b0697eae"
+    var id = "5e136121b4733f33b0697ea3"
+
+    var isfirst = true
+    var addrList: ArrayList<ContactData?>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,7 +59,11 @@ class ContactFragment : Fragment() {
     }
 
     fun refreshContact(){
-        val addrList = getContactList()
+        if (isfirst) {
+            addrList = getContactList()
+            isfirst = false
+        }
+
         // onClick 설정
         val mAdapter = ContactAdapter(requireContext(), addrList) { prof ->
             Toast.makeText(context,"clicked: "+prof.name,Toast.LENGTH_LONG).show()
@@ -108,21 +115,23 @@ class ContactFragment : Fragment() {
 
         tmpThread.join()
 
-        for (elem_id in idList!!) {
-            tmpThread = thread(start = true){
-                Log.d("ContactFragment","get contactdata - id is $elem_id")
-                var retrofit = Retrofit.Builder()
-                    .baseUrl(Config.serverUrl)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build()
+        if(idList!=null) {
+            for (elem_id in idList!!) {
+                tmpThread = thread(start = true) {
+                    Log.d("ContactFragment", "get contactdata - id is $elem_id")
+                    var retrofit = Retrofit.Builder()
+                        .baseUrl(Config.serverUrl)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
 
-                var myService: MyService = retrofit.create(MyService::class.java)
+                    var myService: MyService = retrofit.create(MyService::class.java)
 
-                var body = myService.getContactSimple(elem_id).execute().body()
-                Log.d("ContactFragment","get contactdata - body is $body")
-                resList.add(Util.getContactDataFramSimpleJson(body!!))
+                    var body = myService.getContactSimple(elem_id).execute().body()
+                    Log.d("ContactFragment", "get contactdata - body is $body")
+                    resList.add(Util.getContactDataFramSimpleJson(body!!))
+                }
+                tmpThread.join()
             }
-            tmpThread.join()
         }
 
         return resList

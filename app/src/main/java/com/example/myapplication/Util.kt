@@ -7,6 +7,7 @@ import android.util.Log
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import java.util.*
 
 
 object Util {
@@ -109,6 +110,7 @@ object Util {
         return contactData
     }
 
+
     // Returns ChatroomData created from json string
     fun getChatroomDataFramJson(json: String): ChatroomData {
         val jsonObject = JSONObject(json)
@@ -145,5 +147,20 @@ object Util {
         chatData.script = jsonObject.getString("script")
 
         return chatData
+    }
+
+    fun <T> ArrayList<T>.shuffle(): ArrayList<T> {
+        val rng = Random()
+
+        for (index in 0..this.size - 1) {
+            val randomIndex = rng.nextInt(index)
+
+            // Swap with the random position
+            val temp = this[index]
+            this[index] = this[randomIndex]
+            this[randomIndex] = temp
+        }
+
+        return this
     }
 }

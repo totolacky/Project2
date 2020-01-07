@@ -6,6 +6,7 @@
     <string name="tab_text_3">Gallery</string>
     <string name="default_status">myStatus</string>
     <string name="default_name">myName</string>
+    <string name="default_hashtag">#myHashTag #helloworld #IhateServer</string>
     <string name="signup">Sign up</string>
     <string name="default_lang">Choose your language</string>
 </resources>

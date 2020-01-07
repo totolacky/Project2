@@ -4,6 +4,7 @@ import com.example.myapplication.GalleryData
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface MyService {
@@ -41,6 +42,14 @@ interface MyService {
     // id를 보내면 그 사람의 단순화된 연락처를 보내줌
     fun getContactSimple(@Field("id") id: String): Call<String>
 
+
+
+    /////////////////// 갤러리
+
+    @FormUrlEncoded
+    @POST("/userNumber")
+    fun getUserNumber(@Field("id") id: String): Call<Int>
+
     @FormUrlEncoded
     @POST("/getChatrooms")
     // 유저 id를 보내면 그 사람의 채팅방 리스트를 보내줌
@@ -64,7 +73,7 @@ interface MyService {
     @FormUrlEncoded
     @POST("/initGallery")
     // 나 빼고 다른 user들의 photos + 그 user 정보
-    fun getGallery(@Field("id") id: String): Call<GalleryData>
+    fun getGallery(@Field("id") id: String, @Field("idx") idx: Int): Call<GalleryData>
 
     @FormUrlEncoded
     @POST("/upload")
