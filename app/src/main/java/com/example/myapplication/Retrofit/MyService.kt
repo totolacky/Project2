@@ -1,6 +1,7 @@
 package com.example.myapplication.Retrofit
 
 import com.example.myapplication.GalleryData
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -97,5 +98,10 @@ interface MyService {
     @POST("/createChatroom")
     // 유저 _id 받아서 해당하는 채팅방 id 반환
     fun createChatroom(@Field("myId") myId: String, @Field("yourId") yourId: String): Call<String>
+
+    @FormUrlEncoded
+    @POST("/translate")
+    //
+    fun translate(@Field("script") script: String, @Field("target_lang") tarrget_lang: String): Call<String>
 
 }

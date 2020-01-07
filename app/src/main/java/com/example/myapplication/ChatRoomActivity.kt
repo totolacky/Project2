@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.Retrofit.MyService
@@ -50,7 +51,68 @@ class ChatRoomActivity: AppCompatActivity() {
         initChatroom()
 
         //어댑터 선언
-        cAdapter = ChatAdapter(this, arrayList,prof_images,myId)
+        cAdapter = ChatAdapter(this, arrayList,prof_images,myId) { chatData, isMe ->
+            var res: JSONObject = JSONObject()
+            var script = chatData.script
+            var country: String = when (Util.getCountryFromId(myId)) {
+                0 -> ""
+                1 -> "ko"
+                2 -> "en"
+                else -> ""
+            }
+
+            if (country == ""){
+                // You have no language registered
+            } else {
+                thread(start = true){
+                    var retrofit = Retrofit.Builder()
+                        .baseUrl(Config.serverUrl)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
+
+                    var myService: MyService = retrofit.create(MyService::class.java)
+
+                    res = JSONObject(myService.translate(script,country).execute().body())
+                }.join()
+            }
+
+            Log.d("ChatRoomActivity","Returned JSON: "+res.toString())
+
+            var message = ""
+
+            var title = when (isMe) {
+                true -> "Message correction"
+                false -> "Message translation"
+            }
+
+            if (country == "") {
+                message = "Your account has no language specified."
+            } else if (isMe) {
+                // Message correction
+                if (res.getString("typo") == "true") {
+                    message = res.getString("corrected")
+                } else {
+                    message = "Your grammar is correct."
+                }
+            } else {
+                // Translation
+                message = res.getString("text")
+            }
+
+            val builder: AlertDialog.Builder? = this.let { AlertDialog.Builder(it) }
+            builder?.setTitle(title)
+            builder?.setMessage(message)
+            builder?.setPositiveButton("Ok") { _,_ ->
+                // Closes dialog
+            }
+            builder?.create()?.show()
+
+            if(isMe) {
+                // Does error detection
+            } else {
+                // Translate to your language
+            }
+        }
         chat_recyclerview.adapter = cAdapter
         //레이아웃 매니저 선언
         val lm = LinearLayoutManager(this)
@@ -62,7 +124,6 @@ class ChatRoomActivity: AppCompatActivity() {
         chat_send_button.setOnClickListener {
             sendMessage()
         }
-
     }
 
     override fun onStart() {
