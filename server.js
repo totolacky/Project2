@@ -72,24 +72,23 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                         'hashtag': selectedUser[idx].hashtag,
                     };
     
-                    console.log(selectedUser[idx].photos)
                     console.log(userContactData.name)
-    
+
                     var selectedPhoto=""
-    
+
                     var photoArray = selectedUser[idx].photos;
                     if(photoArray != null){
                         //var randNum = Math.floor(Math.random()*photoArray.length);
-                        selectedPhoto = photoArray[0] 
+                        selectedPhoto = photoArray[0]
                         response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
-                        console.log('Send data to init gallery success'); 
+                        console.log('Send data to init gallery success');
                     }
                     else{
                         console.log('photoArray null');
                         response.json({'selectedPhoto':selectedPhoto, 'userContactData':userContactData});
-                        console.log('Send data fail (selectedPhoto is null)'); 
+                        console.log('Send data fail (selectedPhoto is null)');
                     }
- 
+
                 });
 
 
@@ -121,7 +120,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             console.log(typeof friends)
             console.log(typeof hashtag)
             console.log(typeof chatroom)
-            
+
             if(typeof photos == "string") {photos = [photos]}
             if(typeof friends == "string") {friends = [friends]}
             if(typeof hashtag == "string") {hashtag = [hashtag]}
@@ -131,7 +130,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             console.log(typeof friends)
             console.log(typeof hashtag)
             console.log(typeof chatroom)
-        
+
 
             var insertJson = {
                 'facebookId': facebookId,
@@ -172,9 +171,21 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
 
             var db = client.db('penstagram');
 
-            db.collection('user').find({'id':id},{'photos':1}).add(photo)
-            response.json('add photo success');
-            console.log('add photo success');
+            db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(id)},function(err,user_me){
+                console.log(user_me.name)
+                console.log(user_me.photos)
+                var myPhotos = user_me.photos
+                myPhotos.push(""+photo)
+
+                db.collection('user').updateOne({'_id':mongoose.mongo.ObjectID(id)},{$set:{'photos':myPhotos}},function(err,res){
+                    //if(err) throw err
+                   // console.log('updated')
+
+                    response.json('add photo success');
+                    console.log('add photo success');
+                });
+            });
+
         });
 
         app.post('/checkRegistered', (request,response,next)=>{
@@ -351,10 +362,3 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
         });
     }
 })
-
-
-
-
-
-
-

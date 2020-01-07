@@ -232,10 +232,10 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
 
                         var response = myService.uploadPhoto(myId, bitmapStr!!).execute()
                         Log.d("upload", response.body())
-                        Toast.makeText(getContext(), "upload success", Toast.LENGTH_SHORT).show()
 
                     }
 
+                    Toast.makeText(getContext(), "upload success", Toast.LENGTH_SHORT).show()
                     tmpThread.join()
 
                 }catch (e:Exception){
