@@ -24,22 +24,22 @@ class DbInitActivity : AppCompatActivity() {
     fun testData(){
 
         var testPhotoStrings1: ArrayList<String> = ArrayList()
-//        for(i in 1..3) {
-//            var imageStr = "image0" + i
-//            var resID = getResources().getIdentifier(imageStr, "drawable", getPackageName())
-//            var resBitmap = BitmapFactory.decodeResource(getResources(), resID)
-//            var resString = Util.getStringFromBitmap(resBitmap)
-//            testPhotoStrings1.add(resString!!)
-//        }
+        for(i in 1..9) {
+            var imageStr = "image0" + i
+            var resID = getResources().getIdentifier(imageStr, "drawable", getPackageName())
+            var resBitmap = BitmapFactory.decodeResource(getResources(), resID)
+            var resString = Util.getStringFromBitmap(resBitmap)
+            testPhotoStrings1.add(resString!!)
+        }
 
         var testPhotoStrings2: ArrayList<String> = ArrayList()
-//        for(i in 10..13) {
-//            var imageStr = "image" + i
-//            var resID = getResources().getIdentifier(imageStr, "drawable", getPackageName())
-//            var resBitmap = BitmapFactory.decodeResource(getResources(), resID)
-//            var resString = Util.getStringFromBitmap(resBitmap)
-//            testPhotoStrings2.add(resString!!)
-//        }
+        for(i in 10..20) {
+            var imageStr = "image" + i
+            var resID = getResources().getIdentifier(imageStr, "drawable", getPackageName())
+            var resBitmap = BitmapFactory.decodeResource(getResources(), resID)
+            var resString = Util.getStringFromBitmap(resBitmap)
+            testPhotoStrings2.add(resString!!)
+        }
 
         var testFriendIds1: ArrayList<String> = ArrayList()
 

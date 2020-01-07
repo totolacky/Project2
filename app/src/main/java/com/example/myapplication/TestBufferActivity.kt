@@ -11,7 +11,7 @@ class TestBufferActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         var nextIntent = Intent(this, MainActivity::class.java)
-        nextIntent.putExtra("id", "5e1339297aba722eeba7adab")
+        nextIntent.putExtra("id", "5e1379c2dfdc2037c7bf29d0")
 
         startActivity(nextIntent)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)

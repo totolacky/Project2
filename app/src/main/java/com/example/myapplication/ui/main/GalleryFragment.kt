@@ -11,19 +11,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.*
 import com.example.myapplication.*
 import com.example.myapplication.Config.serverUrl
 import com.example.myapplication.Retrofit.MyService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.android.synthetic.main.fragment_gallery.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.concurrent.thread
 
 
 class GalleryHolder{
@@ -130,21 +126,15 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
         startActivity(intent)
     }
 
-    var retrofit = Retrofit.Builder()
-        .baseUrl(serverUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
 
-    var myService: MyService = retrofit.create(MyService::class.java)
-
-
-    var initNum: Int = 5
+    var initNum: Int = 7
 
     // 내 갤러리에는 남들의 사진들이 뜸
     fun init(){
         // 서버한테 요청
-        for(i in 1..initNum) {
-            myService.getGallery(myId)
+        var cnt = 0
+        while(cnt<initNum) {
+            /*myService.getGallery(myId)
                 .enqueue(object : Callback<GalleryData> {
                     override fun onFailure(
                         call: Call<GalleryData>, t: Throwable
@@ -161,7 +151,34 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                         Log.d("gallery",response.body()?.selectedPhoto)
                         myGalleryList.add(GalleryItem(Util.getBitmapFromString(response.body()!!.selectedPhoto), response.body()!!.userContactData))
                     }
-                })
+                })*/
+
+            var tmpThread = thread(start = true){
+                var retrofit = Retrofit.Builder()
+                    .baseUrl(serverUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+
+                var myService: MyService = retrofit.create(MyService::class.java)
+
+                var response = myService.getGallery(myId).execute()
+                if(response.body()==null) Log.d("gallery","response body is null")
+                else{
+                    if(response.body()!!.selectedPhoto=="") Log.d("gallery","response body selected photo is null")
+                    else {
+                        myGalleryList.add(
+                            GalleryItem(
+                                Util.getBitmapFromString(response.body()!!.selectedPhoto),
+                                response.body()!!.userContactData
+                            )
+                        )
+                        cnt++
+                    }
+                }
+
+            }
+
+            tmpThread.join()
         }
         myGalleryHolder.setDataList(myGalleryList)
         Log.d("init gallery","other users' photos and ContactDatas")
@@ -193,7 +210,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                     var bitmap: Bitmap = MediaStore.Images.Media.getBitmap(getActivity()!!.getContentResolver(), dataUri)
                     var bitmapStr: String? = Util.getStringFromBitmap(bitmap)
 
-                    myService.uploadPhoto(myId, bitmapStr!!).enqueue(object : Callback<String> {
+                    /*myService.uploadPhoto(myId, bitmapStr!!).enqueue(object : Callback<String> {
                         override fun onFailure(
                             call: Call<String>, t: Throwable
                         ) {
@@ -204,11 +221,27 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                         override fun onResponse(
                             call: Call<String>, response: Response<String>
                         ) {
-                            Log.d("upload", response.body())
-                            Toast.makeText(getContext(), "upload success", Toast.LENGTH_SHORT).show()
+
                         }
                     })
-                    // 내 contact data에 올렸으니까 이거 db로 다시 올려야하는데 어떻게 보내지??
+                    // 내 contact data에 올렸으니까 이거 db로 다시 올려야하는데 어떻게 보내지??*/
+
+                    var tmpThread = thread(start = true){
+                        var retrofit = Retrofit.Builder()
+                            .baseUrl(Config.serverUrl)
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build()
+
+                        var myService: MyService = retrofit.create(MyService::class.java)
+
+                        var response = myService.uploadPhoto(myId, bitmapStr!!).execute()
+                        Log.d("upload", response.body())
+                        Toast.makeText(getContext(), "upload success", Toast.LENGTH_SHORT).show()
+
+                    }
+
+                    tmpThread.join()
+
                 }catch (e:Exception){
                     Toast.makeText(getContext(), "$e", Toast.LENGTH_SHORT).show()
                 }

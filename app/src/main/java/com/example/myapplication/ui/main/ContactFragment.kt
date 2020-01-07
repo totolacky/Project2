@@ -23,7 +23,7 @@ import kotlin.concurrent.thread
  */
 class ContactFragment : Fragment() {
 
-    val id = "5e13631eb4733f33b0697eae"
+    var id = "5e136121b4733f33b0697ea3"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,7 +50,7 @@ class ContactFragment : Fragment() {
         @JvmStatic
         fun newInstance(id: String): ContactFragment {
             var newCF = ContactFragment()
-            newCF.userId = id
+            newCF.id = id
             return newCF
         }
     }
@@ -90,21 +90,23 @@ class ContactFragment : Fragment() {
 
         tmpThread.join()
 
-        for (elem_id in idList!!) {
-            tmpThread = thread(start = true){
-                Log.d("ContactFragment","get contactdata - id is $elem_id")
-                var retrofit = Retrofit.Builder()
-                    .baseUrl(Config.serverUrl)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build()
+        if(idList!=null) {
+            for (elem_id in idList!!) {
+                tmpThread = thread(start = true) {
+                    Log.d("ContactFragment", "get contactdata - id is $elem_id")
+                    var retrofit = Retrofit.Builder()
+                        .baseUrl(Config.serverUrl)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
 
-                var myService: MyService = retrofit.create(MyService::class.java)
+                    var myService: MyService = retrofit.create(MyService::class.java)
 
-                var body = myService.getContactSimple(elem_id).execute().body()
-                Log.d("ContactFragment","get contactdata - body is $body")
-                resList.add(Util.getContactDataFramSimpleJson(body!!))
+                    var body = myService.getContactSimple(elem_id).execute().body()
+                    Log.d("ContactFragment", "get contactdata - body is $body")
+                    resList.add(Util.getContactDataFramSimpleJson(body!!))
+                }
+                tmpThread.join()
             }
-            tmpThread.join()
         }
 
         return resList
