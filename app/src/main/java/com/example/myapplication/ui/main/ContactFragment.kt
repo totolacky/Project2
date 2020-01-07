@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,11 +9,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.myapplication.Config
-import com.example.myapplication.ContactData
-import com.example.myapplication.R
+import com.example.myapplication.*
 import com.example.myapplication.Retrofit.MyService
-import com.example.myapplication.Util
 import kotlinx.android.synthetic.main.fragment_contact.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -72,7 +70,7 @@ class ContactFragment : Fragment() {
             // view가 click되었을 때 실행할 것들
 
             val your_id = prof._id
-            var chatroomId: String
+            var chatroomId: String = "nooo"
 
             thread(start = true){
                 var retrofit = Retrofit.Builder()
@@ -87,8 +85,10 @@ class ContactFragment : Fragment() {
             }.join()
 
             // TODO: Open a ChatRoomActivity corresponding to chatroomId
-
-
+            var nextIntent = Intent(context, ChatRoomActivity::class.java)
+            nextIntent.putExtra("myId",id)
+            nextIntent.putExtra("chatroomId",chatroomId)
+            startActivity(nextIntent)
         }
 
         mRecyclerView.adapter = mAdapter

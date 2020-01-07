@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme">
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <activity
-            android:name=".LoginActivity"
+            android:name=".TestBufferActivity"
             android:label="@string/com_facebook_internet_permission_error_message"
 
             android:theme="@style/AppTheme.NoActionBar">

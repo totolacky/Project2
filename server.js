@@ -167,8 +167,8 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             // check exists email
             db.collection('user').find({'facebookId':post_data.facebookId}).count(function(err,number){
                 if(number!=0){
-                    response.json('You already have the account');
-                    console.log('You already have the account');
+                    response.json('You already have an account');
+                    console.log('You already have an account');
                 }
                 else{
                     // insert data
@@ -215,7 +215,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             db.collection('user').find({'facebookId':facebookId}).count(function(err,number){
                 if(number!=0){
                     // User is registered
-                    db.collection('user').findOne({},function(error,res){
+                    db.collection('user').findOne({'facebookId':facebookId},function(error,res){
                         console.log(res._id)
                         response.json(res._id)
                         console.log('You have an account. Your id is '+res._id);
