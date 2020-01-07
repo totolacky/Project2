@@ -371,7 +371,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
             db.collection('user').find({'_id':mongoose.mongo.ObjectID(_id)}).count(function(err,number){
                 if(number!=0){
                     // User is registered
-                    db.collection('user').findOne({},function(error,res){
+                    db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(_id)},function(error,res){
                         //console.log(res)
                         response.json(res.friends)
                         console.log('Friends sent.');
@@ -416,6 +416,29 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                             //console.log(JSON.stringify(resultJson))
                             console.log('Friends sent.');
                         }
+                    })
+                }
+                else{
+                    // User is not registered
+                    response.json('not registered');
+                    console.log('You do not have an account('+_id+': false)');
+                }
+            })
+        });
+
+        app.post('/getContactNum', (request,response,next)=>{
+            var _id = request.body.id;
+
+            var db = client.db('penstagram');
+
+            // check exists email
+            db.collection('user').find({'_id':mongoose.mongo.ObjectID(_id)}).count(function(err,number){
+                if(number!=0){
+                    // User is registered
+                    db.collection('user').findOne({},function(error,res){
+                        //console.log(res)
+                        response.json(res.friends.length)
+                        console.log('Friend number sent.');
                     })
                 }
                 else{
