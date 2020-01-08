@@ -70,6 +70,7 @@ class ChatFragment : Fragment() {
             nextIntent.putExtra("myId",id)
             Log.d("ChatFragment","prof.chatroom_id = "+prof.chatroom_id)
             nextIntent.putExtra("chatroomId",prof.chatroom_id)
+            nextIntent.putExtra("chatroom_name",prof.chatroom_name)
             startActivity(nextIntent)
         }
 

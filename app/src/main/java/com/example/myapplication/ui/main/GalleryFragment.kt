@@ -165,7 +165,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
 
     // recycler view 안에 있는 사진 선택 시 액티비티 시작 (사진, 사진 user, user와의 chat)
     override fun onItemSelected(view: View, position: Int){
-        Toast.makeText(getContext(), "Clicked Image ${position+1}", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(getContext(), "Clicked Image ${position+1}", Toast.LENGTH_SHORT).show()
         val intent = Intent(activity, GalleryItemInformation::class.java)
         intent.putExtra("POS", position)
         intent.putExtra("MYID", myId)
@@ -333,7 +333,7 @@ class GalleryFragment : Fragment(), GalleryRecyclerAdapter.OnListItemSelectedInt
                     tmpThread.join()
 
                 }catch (e:Exception){
-                    Toast.makeText(getContext(), "$e", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(getContext(), "$e", Toast.LENGTH_SHORT).show()
                 }
             }
             else{

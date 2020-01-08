@@ -63,7 +63,7 @@ class GalleryItemInformation : AppCompatActivity() {
 
         val messageButton: ImageButton = findViewById(R.id.message)
         messageButton.setOnClickListener {
-            Toast.makeText(getApplicationContext(), "You can send message to "+userName.text, Toast.LENGTH_SHORT).show()
+            //Toast.makeText(getApplicationContext(), "You can send message to "+userName.text, Toast.LENGTH_SHORT).show()
 
             // 채팅방으로 옮기기
             var tmpThread = thread(start = true){
@@ -85,6 +85,7 @@ class GalleryItemInformation : AppCompatActivity() {
                     val intent = Intent(this, ChatRoomActivity::class.java)
                     intent.putExtra("myId", myId)
                     intent.putExtra("chatroomId", chatroomId)
+                    intent.putExtra("chatroom_name",thisItem.userInfo!!.name)
                     startActivity(intent)
                 }
             }
@@ -93,7 +94,7 @@ class GalleryItemInformation : AppCompatActivity() {
 
         val newFriendButton: ImageButton = findViewById(R.id.newfriend)
         newFriendButton.setOnClickListener {
-            Toast.makeText(getApplicationContext(), "You become a friend with "+userName.text, Toast.LENGTH_SHORT).show()
+            Toast.makeText(getApplicationContext(), "You became a friend with "+userName.text, Toast.LENGTH_SHORT).show()
 
             // 친구추가하기
             var tmpThread = thread(start = true){

@@ -44,9 +44,10 @@ class ChatRoomActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_room)
 
-        // TODO: ChatRoomActivity 호출 시 이 두 가지 제공할 것
+        // TODO: ChatRoomActivity 호출 시 이 세 가지 제공할 것
         myId = intent.getStringExtra("myId")
         chatroomId = intent.getStringExtra("chatroomId")
+        this.title = intent.getStringExtra("chatroom_name")
 
         initChatroom()
 
@@ -258,7 +259,7 @@ class ChatRoomActivity: AppCompatActivity() {
         data.put("myId",myId)
         data.put("chatroomId",chatroomId)
         data.put("people",JSONArray(chatroomData.people))
-        mSocket!!.emit("clientConnect", data)
+        mSocket.emit("clientConnect", data)
     }
 
     // 서버로부터 전달받은 'chat-message' Event 처리.

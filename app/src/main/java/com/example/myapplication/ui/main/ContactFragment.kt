@@ -88,6 +88,7 @@ class ContactFragment : Fragment() {
             var nextIntent = Intent(context, ChatRoomActivity::class.java)
             nextIntent.putExtra("myId",id)
             nextIntent.putExtra("chatroomId",chatroomId)
+            nextIntent.putExtra("chatroom_name",prof.name)
             startActivity(nextIntent)
         }
 
