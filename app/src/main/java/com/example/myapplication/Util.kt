@@ -123,6 +123,7 @@ object Util {
 
         Log.d("Util",json)
 
+        chatroomData.chatroom_id = jsonObject.getString("chatroom_id")
         chatroomData.chatroom_name = jsonObject.getString("chatroom_name")
         chatroomData.last_chat = jsonObject.getString("last_chat")
         chatroomData.chatroom_image = jsonObject.getString("chatroom_image")

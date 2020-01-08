@@ -16,7 +16,7 @@ class TestBufferActivity : AppCompatActivity() {
 
         var nextIntent = Intent(this, MainActivity::class.java)
         nextIntent.putExtra("id", "5e14c37d7504b44b68b80120")
-        nextIntent.putExtra("chatroomId","5e139cb3af8d393ace9217c7")
+        //nextIntent.putExtra("chatroomId","5e139cb3af8d393ace9217c7")
 
         startActivity(nextIntent)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)

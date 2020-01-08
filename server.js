@@ -59,6 +59,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
 
                 console.log(JSON.stringify(resJson))
                 response.json(JSON.stringify(resJson))
+
             }).catch(err => {
                 console.error(err)
             });
@@ -488,6 +489,13 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                     // User is registered
                     db.collection('user').findOne({'_id':mongoose.mongo.ObjectID(_id)},function(error,res){
                         //console.log(res.chatroom)
+                        // var resJson = {
+                        //     'chatroom_id': res._id.toString(),
+                        //     'chatroom_name': res.chatroom_name,
+                        //     'last_chat': res.last_chat,
+                        //     'chatroom_image': res.chatroom_image,
+                        //     'people': res.people
+                        // }
                         response.json(res.chatroom)
                         console.log('Chatrooms sent.');
                     })
@@ -542,7 +550,7 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
 
                             //console.log(res)
                             var resultJson = {
-                                'chatroom_id': res.chatroom_id,
+                                'chatroom_id': res._id.toString(),
                                 'chatroom_name': res.chatroom_name,
                                 'last_chat': res.last_chat,
                                 'chatroom_image': res.chatroom_image,
@@ -655,7 +663,6 @@ MongoClient.connect(url, {useUnifiedTopology: true}, function(err,client){
                 }
             })
         });
-
 
         // Start Web Server
         var server = app.listen(80, ()=>{

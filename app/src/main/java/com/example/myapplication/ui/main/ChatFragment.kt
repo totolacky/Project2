@@ -68,6 +68,7 @@ class ChatFragment : Fragment() {
             // view가 click되었을 때 실행할 것들
             var nextIntent = Intent(context, ChatRoomActivity::class.java)
             nextIntent.putExtra("myId",id)
+            Log.d("ChatFragment","prof.chatroom_id = "+prof.chatroom_id)
             nextIntent.putExtra("chatroomId",prof.chatroom_id)
             startActivity(nextIntent)
         }
