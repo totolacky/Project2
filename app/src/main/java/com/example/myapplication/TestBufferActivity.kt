@@ -15,7 +15,9 @@ class TestBufferActivity : AppCompatActivity() {
 //        Log.d("bitmap",Util.getStringFromBitmap(BitmapFactory.decodeResource(resources,R.drawable.def_icon)))
 
         var nextIntent = Intent(this, MainActivity::class.java)
-        nextIntent.putExtra("id", "5e14c37d7504b44b68b80120")
+        val fId = "5e14c3137504b44b68b8011a"
+        val myId = "5e14c37d7504b44b68b80120"
+        nextIntent.putExtra("id", fId)
         //nextIntent.putExtra("chatroomId","5e139cb3af8d393ace9217c7")
 
         startActivity(nextIntent)

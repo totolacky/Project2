@@ -96,7 +96,7 @@ class ChatRoomActivity: AppCompatActivity() {
                 }
             } else {
                 // Translation
-                message = res.getString("text")
+                message = res.getString("res_script")
             }
 
             val builder: AlertDialog.Builder? = this.let { AlertDialog.Builder(it) }
