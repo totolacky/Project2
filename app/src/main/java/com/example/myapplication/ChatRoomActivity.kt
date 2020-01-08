@@ -59,6 +59,14 @@ class ChatRoomActivity: AppCompatActivity() {
                 0 -> ""
                 1 -> "ko"
                 2 -> "en"
+                3 -> "ru"
+                4 -> "th"
+                5 -> "de"
+                6 -> "zh-CN"
+                7 -> "ar"
+                8 -> "nl"
+                9 -> "cs"
+                10 -> "ro"
                 else -> ""
             }
 

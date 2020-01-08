@@ -63,28 +63,58 @@ class SignupActivity : AppCompatActivity() {
             //Toast.makeText(applicationContext, "Select_language clicked",Toast.LENGTH_LONG).show()
 
             val builder = AlertDialog.Builder(this)
-            builder.setTitle("Which language do you use?")
+            builder.setTitle("Where are you from?")
 
             val defaultLang = resources.getString(R.string.default_lang)
-            val languages = arrayOf(defaultLang,"Korean","English")
+            val languages = arrayOf("Others","Korea","America","Russia","Thailand","Germany","China","Saudi Arabia","Netherlands","Czechia","Swiss")
             builder.setItems(languages) { dialog, which ->
                 when (which) {
                     0 -> {
                         flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_0))
-                        language_text.text = "Unknown"
-                        contactData.country_code = 0
+                        language_text.text = "Others"
                     }
                     1 -> {
                         flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_1))
-                        language_text.text = "Korean"
-                        contactData.country_code = 1
+                        language_text.text = "Korea"
                     }
                     2 -> {
                         flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_2))
-                        language_text.text = "English"
-                        contactData.country_code = 2
+                        language_text.text = "America"
+                    }
+                    3 -> {
+                        flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_3))
+                        language_text.text = "Russia"
+                    }
+                    4 -> {
+                        flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_4))
+                        language_text.text = "Thailand"
+                    }
+                    5 -> {
+                        flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_5))
+                        language_text.text = "Germany"
+                    }
+                    6 -> {
+                        flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_6))
+                        language_text.text = "China"
+                    }
+                    7 -> {
+                        flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_7))
+                        language_text.text = "Saudi Arabia"
+                    }
+                    8 -> {
+                        flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_8))
+                        language_text.text = "Netherlands"
+                    }
+                    9 -> {
+                        flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_9))
+                        language_text.text = "Czechia"
+                    }
+                    10 -> {
+                        flag_signup.setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.flag_10))
+                        language_text.text = "Swiss"
                     }
                 }
+                contactData.country_code = which
             }
 
             builder.create().show()
