@@ -12,9 +12,9 @@ Penstagram(PENpal + inSTAGRAM) is a penpal app, where you can find new friends w
 ## Features
 ### 1. Register and log in with Facebook
 ![pic1-1](./readme_images/pic1-1.png)
-![pic1-2](./readme_images/pic1-2.png)
 ![pic1-3](./readme_images/pic1-3.png)
 ![pic1-4](./readme_images/pic1-4.png)
+![pic1-5](./readme_images/pic1-5.png)
 
 // Facebook login 기능 설명
 
