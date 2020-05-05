@@ -5,6 +5,8 @@ Penstagram(PENpal + inSTAGRAM) is a penpal app, where you can find new friends w
 
 펜스타그램은 사진을 업로드하고, 업로드한 사진을 통해 새로운 외국인 친구들을 만들 수 있는 펜팔 앱입니다.
 
+Developed by 이제인, 송우민
+
 ## What is it?
 2019년 겨울 몰입캠프 2주차 과제로 제작한 안드로이드 어플리케이션입니다.
 
